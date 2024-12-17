@@ -1,9 +1,9 @@
-import Test from "../components/test"
+import { Home } from "../pages/home"
 
 function App() {
 
   return (
-    <Test />
+    <Home></Home>
   )
 }
 

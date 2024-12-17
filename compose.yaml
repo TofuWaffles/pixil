@@ -1,0 +1,17 @@
+services:
+  client:
+    container_name: frontend
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    restart: always
+    network_mode: bridge
+    ports:
+      - 3000:3000
+
+      # backend:
+      #   container_name: backend
+      #   build:
+      #     context: ./backend/
+      #     dockerfile: Dockerfile
+      #   restart: always

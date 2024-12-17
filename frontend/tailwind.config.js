@@ -16,6 +16,9 @@ export default {
             "onyx": "#343A40",
             "eerie-black": "#212529",
         },
+        fontFamily: {
+            
+        },
         extend: {},
     },
     plugins: [],
