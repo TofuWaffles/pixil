@@ -1,5 +1,5 @@
 services:
-  client:
+  frontend:
     container_name: frontend
     build:
       context: ./frontend/
@@ -15,6 +15,7 @@ services:
       context: ./backend/
       dockerfile: Dockerfile
     restart: always
+    network_mode: bridge
 
   postgres:
     container_name: postgresql
@@ -26,12 +27,14 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/usr/share/pixil/pgdata
+      - pg_data:/usr/share/pixil/pg_data
     restart: always
-    networks:
-      - postgresql
+    network_mode: bridge
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
+
+volumes:
+  pg_data:
