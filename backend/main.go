@@ -8,7 +8,7 @@ import (
 
 func main() {
 	mux := http.NewServeMux()
-    mux.HandleFunc("/", handlers.Home)
+	mux.HandleFunc("/", handlers.Home)
 
 	log.Println("Starting server on :4000")
 
