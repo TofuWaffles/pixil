@@ -5,7 +5,8 @@ services:
       context: ./frontend/
       dockerfile: Dockerfile
     restart: always
-    network_mode: bridge
+    networks:
+      - frontend
     ports:
       - 3000:3000
 
@@ -15,10 +16,16 @@ services:
       context: ./backend/
       dockerfile: Dockerfile
     restart: always
-    network_mode: bridge
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable"
+    networks:
+      - backend
+      - postgres
+    depends_on:
+      - postgres
 
   postgres:
-    container_name: postgresql
+    container_name: postgres
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -27,14 +34,24 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pg_data:/usr/share/pixil/pg_data
+      - pg_data:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d
     restart: always
-    network_mode: bridge
+    networks:
+      - postgres
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
+      
+networks:
+  postgres:
+    driver: bridge
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge
 
 volumes:
   pg_data:
