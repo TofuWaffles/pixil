@@ -40,7 +40,7 @@ services:
     networks:
       - postgres
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      test: ["CMD", "pg_isready", "${POSTGRES_DB}", "-U", "${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
