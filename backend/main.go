@@ -19,14 +19,6 @@ func main() {
 	}
 	defer dbpool.Close()
 
-	var greeting string
-	err = dbpool.QueryRow(context.Background(), "select 'Cannyseallove!'").Scan(&greeting)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
-		os.Exit(1)
-	}
-	log.Println(greeting)
-
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handlers.Home)
 
