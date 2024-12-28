@@ -35,8 +35,21 @@ const UploadAndDisplayImage = () => {
           if (event.target == null) {
             return;
           }
-          console.log(event.target.files![0]); // Log the selected file
-          setSelectedImage(event.target.files![0]); // Update the state with the selected file
+          const data = new FormData();
+          data.append('file', event.target.files![0])
+          data.append('name', 'Canny Photo')
+          data.append('desc', 'Canny Description')
+          fetch("http://127.0.0.1:4000/upload", {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+            },
+            body: data
+          }).then((response) => {
+            console.log(event.target.files![0]); // Log the selected file
+            console.log(response)
+            setSelectedImage(event.target.files![0]); // Update the state with the selected file
+          })
         }}
       />
     </div>

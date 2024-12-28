@@ -9,6 +9,8 @@ services:
       - frontend
     ports:
       - 3000:3000
+    environment:
+      DOMAIN_URL: "${DOMAIN_URL}"
     volumes:
       - /app/node_modules
       - ./frontend:/app
@@ -22,10 +24,14 @@ services:
     environment:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable"
     networks:
+      - frontend
       - backend
-      - postgres
     ports:
       - 4000:4000
+    volumes:
+      - type: bind
+        target: /pixil-media/
+        source: /home/span/Pictures/pixil/
     depends_on:
       - postgres
 
@@ -43,7 +49,7 @@ services:
       - ./sql:/docker-entrypoint-initdb.d
     restart: always
     networks:
-      - postgres
+      - backend
     healthcheck:
       test: ["CMD", "pg_isready", "${POSTGRES_DB}", "-U", "${POSTGRES_USER}"]
       interval: 10s
@@ -51,11 +57,9 @@ services:
       retries: 5
       
 networks:
-  postgres:
+  frontend:
     driver: bridge
   backend:
-    driver: bridge
-  frontend:
     driver: bridge
 
 volumes:

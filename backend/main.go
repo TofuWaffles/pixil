@@ -21,6 +21,8 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handlers.Home)
+	fmt.Println("Adding cannypath")
+	mux.HandleFunc("/upload", handlers.ReceiveMedia)
 
 	log.Println("Starting server on :4000")
 
