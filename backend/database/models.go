@@ -49,7 +49,7 @@ func GetUser(ctx context.Context, db *pgxpool.Pool, email string) (User, error) 
 func AddUser(ctx context.Context, db *pgxpool.Pool, user User) error {
 	_, err := db.Exec(ctx,
 		`INSERT INTO user (email, username, password_salt, password_hash)
-		VALUES $1, $2, $3, $4`,
+		VALUES ($1, $2, $3, $4)`,
 		user.Email,
 		user.Username,
 		user.PasswordSalt,
@@ -103,7 +103,7 @@ func GetAllActiveMedia(ctx context.Context, db *pgxpool.Pool) ([]Media, error) {
 func AddMedia(ctx context.Context, db *pgxpool.Pool, media Media) error {
 	_, err := db.Exec(ctx,
 		`INSERT INTO media (path, owner_email, file_type, status)
-		VALUES $1, $2, $3, $4`,
+		VALUES ($1, $2, $3, $4)`,
 		media.Path,
 		media.OwnerEmail,
 		media.FileType,
