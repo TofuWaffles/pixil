@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/TofuWaffles/pixil/database"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -9,13 +10,19 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+type Env struct {
+	database *pgxpool.Pool
+}
 
 func Home(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello from Seallove!"))
 }
 
-func UploadTest(w http.ResponseWriter, r *http.Request) {
+func (e Env) UploadTest(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Uploading Canny...")
 	r.ParseMultipartForm(32 << 20)
 
@@ -30,13 +37,27 @@ func UploadTest(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	dst, err := os.OpenFile(filepath.Join(dir, filepath.Base(header.Filename)), os.O_RDWR|os.O_CREATE, 0644)
+
+	path := filepath.Join(dir, filepath.Base(header.Filename))
+	dst, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		panic(err)
 	}
 	defer dst.Close()
 
 	if _, err := io.Copy(dst, file); err != nil {
+		panic(err)
+	}
+
+	media := models.Media{
+		Path:       path,
+		OwnerEmail: "",
+		FileType:   filepath.Ext(path),
+		Status:     models.Active,
+	}
+
+	err = models.AddMedia(r.Context(), e.database, media)
+	if err != nil {
 		panic(err)
 	}
 
