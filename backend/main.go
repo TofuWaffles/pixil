@@ -19,9 +19,11 @@ func main() {
 	}
 	defer dbpool.Close()
 
+	env := handlers.Env{Database: dbpool}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handlers.Home)
-	mux.HandleFunc("/upload-test", handlers.UploadTest)
+	mux.HandleFunc("/upload-test", env.UploadTest)
 	mux.HandleFunc("/download-test", handlers.DownloadTest)
 
 	log.Println("Starting server on :4000")

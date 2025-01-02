@@ -15,7 +15,7 @@ import (
 )
 
 type Env struct {
-	database *pgxpool.Pool
+	Database *pgxpool.Pool
 }
 
 func Home(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +56,7 @@ func (e Env) UploadTest(w http.ResponseWriter, r *http.Request) {
 		Status:     models.Active,
 	}
 
-	err = models.AddMedia(r.Context(), e.database, media)
+	err = models.AddMedia(r.Context(), e.Database, media)
 	if err != nil {
 		panic(err)
 	}
