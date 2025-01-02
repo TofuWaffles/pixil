@@ -11,6 +11,10 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+type Env struct {
+	database *pgxpool.Pool
+}
+
 func main() {
 	dbpool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
@@ -21,8 +25,8 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handlers.Home)
-	fmt.Println("Adding cannypath")
-	mux.HandleFunc("/upload", handlers.ReceiveMedia)
+	mux.HandleFunc("/upload-test", handlers.UploadTest)
+	mux.HandleFunc("/download-test", handlers.DownloadTest)
 
 	log.Println("Starting server on :4000")
 

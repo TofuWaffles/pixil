@@ -2,7 +2,6 @@ import { useState } from "react";
 
 const UploadAndDisplayImage = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-
   return (
     <div>
       {/* Header */}
@@ -39,7 +38,7 @@ const UploadAndDisplayImage = () => {
           data.append('file', event.target.files![0])
           data.append('name', 'Canny Photo')
           data.append('desc', 'Canny Description')
-          fetch("http://127.0.0.1:4000/upload", {
+          fetch("http://127.0.0.1:4000/upload-test", {
             method: 'POST',
             headers: {
               'Accept': 'application/json',
