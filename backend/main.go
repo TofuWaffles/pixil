@@ -9,6 +9,7 @@ import (
 
 	"github.com/TofuWaffles/pixil/handlers"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -29,6 +30,6 @@ func main() {
 
 	log.Println("Starting server on :4000")
 
-	err = http.ListenAndServe(":4000", mux)
+	err = http.ListenAndServe(":4000", cors.Default().Handler(mux))
 	log.Fatal(err)
 }

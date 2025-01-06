@@ -25,7 +25,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (e Env) AllActiveMediaIds(w http.ResponseWriter, r *http.Request) {
-	enableCORS(w)
 	media, err := models.GetAllActiveMedia(r.Context(), e.Database)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -83,19 +82,7 @@ func (e Env) UploadTest(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func enableCORS(w http.ResponseWriter) {
-	// TODO: Make this a chainable middleware
-	w.Header().Set("Access-Control-Allow-Origin", "*") // Allow all origins (adjust this in production)
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept")
-}
-
-func ListMedia(w http.ResponseWriter, r *http.Request) {
-	enableCORS(w)
-}
-
 func DownloadTest(w http.ResponseWriter, r *http.Request) {
-	enableCORS(w) // Add CORS headers
 	if r.Method == "OPTIONS" {
 		w.WriteHeader(http.StatusOK)
 		return
