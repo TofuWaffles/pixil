@@ -4,15 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
+	"mime"
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/TofuWaffles/pixil/database"
-
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -36,6 +38,55 @@ func (e Env) AllActiveMediaIds(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(media)
+}
+
+func (e Env) Media(w http.ResponseWriter, r *http.Request) {
+	idParam := r.URL.Query().Get("id")
+	if idParam == "" {
+		http.Error(w, "missing 'id' query parameter", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		http.Error(w, "invalid 'id' query parameter", http.StatusBadRequest)
+		return
+	}
+
+	media, err := models.GetMedia(r.Context(), e.Database, id)
+	if err != nil {
+		http.Error(w, "error fetching media: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	file, err := os.Open(media.Filepath)
+	if err != nil {
+		http.Error(w, "error opening file: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	mimeType := mime.TypeByExtension(filepath.Ext(media.Filepath))
+	if mimeType == "" {
+		mimeType = "application/octet-stream"
+	}
+
+	fileBytes, err := io.ReadAll(file)
+	if err != nil {
+		file.Close()
+		http.Error(w, "error reading file: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	file.Close()
+
+	w.Header().Set("Content-Type", mimeType)
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(fileBytes)))
+
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write(fileBytes)
+	if err != nil {
+		log.Printf("error writing response: %v", err)
+	}
 }
 
 func (e Env) UploadTest(w http.ResponseWriter, r *http.Request) {

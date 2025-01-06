@@ -21,7 +21,7 @@ const (
 )
 
 type Media struct {
-	Id         int32
+	Id         int
 	Filepath   string
 	OwnerEmail string
 	FileType   string
@@ -29,7 +29,7 @@ type Media struct {
 }
 
 type Tag struct {
-	MediaId int32
+	MediaId int
 	Label   string
 }
 
@@ -59,18 +59,20 @@ func AddUser(ctx context.Context, db *pgxpool.Pool, user User) error {
 	return err
 }
 
-func GetMedia(ctx context.Context, db *pgxpool.Pool, id int32) (Media, error) {
-	row := db.QueryRow(ctx,
+func GetMedia(ctx context.Context, db *pgxpool.Pool, id int) (Media, error) {
+	rows, err := db.Query(ctx,
 		`SELECT id, filepath, owner_email, file_type, status
 		FROM media
-		WHERE id = $1`,
+		WHERE id = $1
+		LIMIT 1
+		`,
 		id,
 	)
+	if err != nil {
+		return Media{}, err
+	}
 
-	media := Media{}
-	err := row.Scan(media.Id, media.Filepath, media.OwnerEmail, media.FileType, media.Status)
-
-	return media, err
+	return pgx.CollectOneRow(rows, pgx.RowToStructByName[Media])
 }
 
 func GetAllActiveMedia(ctx context.Context, db *pgxpool.Pool) ([]Media, error) {
