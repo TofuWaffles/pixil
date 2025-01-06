@@ -23,6 +23,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handlers.Home)
+	mux.HandleFunc("/all-active-media", env.AllActiveMediaIds)
 	mux.HandleFunc("/upload-test", env.UploadTest)
 	mux.HandleFunc("/download-test", handlers.DownloadTest)
 

@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -21,7 +22,7 @@ const (
 
 type Media struct {
 	Id         int32
-	Path       string
+	Filepath   string
 	OwnerEmail string
 	FileType   string
 	Status     int
@@ -60,40 +61,29 @@ func AddUser(ctx context.Context, db *pgxpool.Pool, user User) error {
 
 func GetMedia(ctx context.Context, db *pgxpool.Pool, id int32) (Media, error) {
 	row := db.QueryRow(ctx,
-		`SELECT (id, path, owner_email, file_type, status)
+		`SELECT id, filepath, owner_email, file_type, status
 		FROM media
 		WHERE id = $1`,
 		id,
 	)
 
 	media := Media{}
-	err := row.Scan(media.Id, media.Path, media.OwnerEmail, media.FileType, media.Status)
+	err := row.Scan(media.Id, media.Filepath, media.OwnerEmail, media.FileType, media.Status)
 
 	return media, err
 }
 
 func GetAllActiveMedia(ctx context.Context, db *pgxpool.Pool) ([]Media, error) {
-	media := []Media{}
-	rows, err := db.Query(ctx,
-		`SELECT (id, path, owner_email, file_type, status)
+	rows, _ := db.Query(ctx,
+		`SELECT id, filepath, owner_email, file_type, status
 		FROM media
 		WHERE status = $1`,
 		Active,
 	)
-	if err != nil {
-		return media, err
-	}
 	defer rows.Close()
 
-	cur := Media{}
-	for rows.Next() {
-		if err := rows.Scan(cur.Id, cur.Path, cur.OwnerEmail, cur.FileType, cur.Status); err != nil {
-			return []Media{}, err
-		}
-		media = append(media, cur)
-		cur = Media{}
-	}
-	if err = rows.Err(); err != nil {
+	media, err := pgx.CollectRows(rows, pgx.RowToStructByName[Media])
+	if err != nil {
 		return []Media{}, err
 	}
 
@@ -102,9 +92,9 @@ func GetAllActiveMedia(ctx context.Context, db *pgxpool.Pool) ([]Media, error) {
 
 func AddMedia(ctx context.Context, db *pgxpool.Pool, media Media) error {
 	_, err := db.Exec(ctx,
-		`INSERT INTO media (path, owner_email, file_type, status)
+		`INSERT INTO media (filepath, owner_email, file_type, status)
 		VALUES ($1, $2, $3, $4)`,
-		media.Path,
+		media.Filepath,
 		media.OwnerEmail,
 		media.FileType,
 		media.Status,

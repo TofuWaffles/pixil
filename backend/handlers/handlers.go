@@ -1,8 +1,8 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/TofuWaffles/pixil/database"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -10,6 +10,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/TofuWaffles/pixil/database"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -20,6 +22,21 @@ type Env struct {
 
 func Home(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello from Seallove!"))
+}
+
+func (e Env) AllActiveMediaIds(w http.ResponseWriter, r *http.Request) {
+	enableCORS(w)
+	media, err := models.GetAllActiveMedia(r.Context(), e.Database)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	fmt.Println(media)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(media)
 }
 
 func (e Env) UploadTest(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +67,7 @@ func (e Env) UploadTest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	media := models.Media{
-		Path:       path,
+		Filepath:   path,
 		OwnerEmail: "",
 		FileType:   filepath.Ext(path),
 		Status:     models.Active,

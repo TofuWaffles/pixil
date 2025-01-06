@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS "user" (
 
 CREATE TABLE IF NOT EXISTS media (
   id SERIAL PRIMARY KEY,
-  path VARCHAR(255) NOT NULL,
+  filepath VARCHAR(255) NOT NULL,
   owner_email VARCHAR(255),
   file_type VARCHAR(255),
   status INT NOT NULL
