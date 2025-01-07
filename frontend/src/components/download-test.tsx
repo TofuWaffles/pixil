@@ -20,7 +20,7 @@ export function DisplayImages() {
 
         // Step 2: Fetch each image file by ID
         const imagePromises = imageIds.map(async (id: number) => {
-          const imageResponse = await fetch(`http://127.0.0.1:4000/media?id=${id}`);
+          const imageResponse = await fetch(`http://127.0.0.1:4000/thumbnail?id=${id}`);
           if (!imageResponse.ok) {
             throw new Error(`Error fetching image with ID ${id}: ${imageResponse.statusText}`);
           }

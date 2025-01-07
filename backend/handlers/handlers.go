@@ -1,8 +1,12 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"image"
+	"image/jpeg"
+	"image/png"
 	"io"
 	"log"
 	"mime"
@@ -84,6 +88,64 @@ func (e Env) Media(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(fileBytes)
+	if err != nil {
+		log.Printf("error writing response: %v", err)
+	}
+}
+
+func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
+	idParam := r.URL.Query().Get("id")
+	if idParam == "" {
+		http.Error(w, "missing 'id' query parameter", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		http.Error(w, "invalid 'id' query parameter", http.StatusBadRequest)
+		return
+	}
+
+	media, err := models.GetMedia(r.Context(), e.Database, id)
+	if err != nil {
+		http.Error(w, "error fetching media: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	file, err := os.Open(media.Filepath)
+	if err != nil {
+		http.Error(w, "error opening file: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+
+	var img image.Image
+	switch filepath.Ext(media.Filepath) {
+	case ".png":
+		img, err = png.Decode(file)
+	case ".jpg", ".jpeg":
+		img, err = jpeg.Decode(file)
+	default:
+		http.Error(w, "unsupported image format", http.StatusUnsupportedMediaType)
+		return
+	}
+	if err != nil {
+		http.Error(w, "error decoding image: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	var buf bytes.Buffer
+	err = jpeg.Encode(&buf, img, &jpeg.Options{Quality: 50})
+	if err != nil {
+		http.Error(w, "error encoding thumbnail: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "image/jpeg")
+	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
+	w.WriteHeader(http.StatusOK)
+
+	_, err = w.Write(buf.Bytes())
 	if err != nil {
 		log.Printf("error writing response: %v", err)
 	}

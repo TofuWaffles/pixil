@@ -25,7 +25,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handlers.Home)
 	mux.HandleFunc("/all-active-media", env.AllActiveMediaIds)
-	mux.HandleFunc("/media", handlers.Chain(env.Media, handlers.Logging()))
+	mux.HandleFunc("/thumbnail", handlers.Chain(env.Thumbnail, handlers.Logging()))
 	mux.HandleFunc("/upload-test", env.UploadTest)
 	mux.HandleFunc("/download-test", handlers.DownloadTest)
 
