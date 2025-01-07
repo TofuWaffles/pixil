@@ -19,6 +19,7 @@ import (
 	"strings"
 
 	"github.com/TofuWaffles/pixil/database"
+	"github.com/TofuWaffles/pixil/utils"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -45,16 +46,9 @@ func (e Env) AllActiveMediaIds(w http.ResponseWriter, r *http.Request) {
 }
 
 func (e Env) Media(w http.ResponseWriter, r *http.Request) {
-	idParam := r.URL.Query().Get("id")
-	if idParam == "" {
-		http.Error(w, "missing 'id' query parameter", http.StatusBadRequest)
-		return
-	}
-
-	id, err := strconv.Atoi(idParam)
+	id, err := utils.IdFromParam(r)
 	if err != nil {
-		http.Error(w, "invalid 'id' query parameter", http.StatusBadRequest)
-		return
+		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
 	media, err := models.GetMedia(r.Context(), e.Database, id)
