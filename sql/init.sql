@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS media (
   filepath VARCHAR(255) NOT NULL,
   owner_email VARCHAR(255),
   file_type VARCHAR(255),
-  status INT NOT NULL
+  status INT NOT NULL,
+  created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT (current_timestamp AT TIME ZONE 'UTC')
 );
 
 CREATE TABLE IF NOT EXISTS tag (

@@ -2,16 +2,17 @@ package models
 
 import (
 	"context"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type User struct {
-	Email        string
-	Username     string
-	PasswordSalt string
-	PasswordHash string
+	Email        string `json:"email"`
+	Username     string `json:"username"`
+	PasswordSalt string `json:"passwordSalt"`
+	PasswordHash string `json:"passwordHash"`
 }
 
 const (
@@ -21,16 +22,17 @@ const (
 )
 
 type Media struct {
-	Id         int
-	Filepath   string
-	OwnerEmail string
-	FileType   string
-	Status     int
+	Id         int       `json:"id"`
+	Filepath   string    `json:"filepath"`
+	OwnerEmail string    `json:"ownerEmail"`
+	FileType   string    `json:"fileType"`
+	Status     int       `json:"status"`
+	CreatedAt  time.Time `json:"createdAt"`
 }
 
 type Tag struct {
-	MediaId int
-	Label   string
+	MediaId int    `json:"mediaId"`
+	Label   string `json:"label"`
 }
 
 func GetUser(ctx context.Context, db *pgxpool.Pool, email string) (User, error) {
@@ -61,7 +63,7 @@ func AddUser(ctx context.Context, db *pgxpool.Pool, user User) error {
 
 func GetMedia(ctx context.Context, db *pgxpool.Pool, id int) (Media, error) {
 	rows, err := db.Query(ctx,
-		`SELECT id, filepath, owner_email, file_type, status
+		`SELECT id, filepath, owner_email, file_type, status, created_at
 		FROM media
 		WHERE id = $1
 		LIMIT 1
@@ -72,19 +74,19 @@ func GetMedia(ctx context.Context, db *pgxpool.Pool, id int) (Media, error) {
 		return Media{}, err
 	}
 
-	return pgx.CollectOneRow(rows, pgx.RowToStructByName[Media])
+	return pgx.CollectOneRow(rows, pgx.RowToStructByPos[Media])
 }
 
 func GetAllActiveMedia(ctx context.Context, db *pgxpool.Pool) ([]Media, error) {
 	rows, _ := db.Query(ctx,
-		`SELECT id, filepath, owner_email, file_type, status
+		`SELECT id, filepath, owner_email, file_type, status, created_at
 		FROM media
 		WHERE status = $1`,
 		Active,
 	)
 	defer rows.Close()
 
-	media, err := pgx.CollectRows(rows, pgx.RowToStructByName[Media])
+	media, err := pgx.CollectRows(rows, pgx.RowToStructByPos[Media])
 	if err != nil {
 		return []Media{}, err
 	}
@@ -94,8 +96,8 @@ func GetAllActiveMedia(ctx context.Context, db *pgxpool.Pool) ([]Media, error) {
 
 func AddMedia(ctx context.Context, db *pgxpool.Pool, media Media) error {
 	_, err := db.Exec(ctx,
-		`INSERT INTO media (filepath, owner_email, file_type, status)
-		VALUES ($1, $2, $3, $4)`,
+		`INSERT INTO media (filepath, owner_email, file_type, status, created_at)
+		VALUES ($1, $2, $3, $4, NOW())`,
 		media.Filepath,
 		media.OwnerEmail,
 		media.FileType,

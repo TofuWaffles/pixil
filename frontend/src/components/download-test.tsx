@@ -16,7 +16,7 @@ export function DisplayImages() {
         }
 
         const imageList = await response.json(); // Assuming the API returns an array of objects like [{ Id: 1 }, { Id: 2 }]
-        const imageIds = imageList.map((item: { Id: number }) => item.Id);
+        const imageIds = imageList.map((item: { id: number }) => item.id);
 
         // Step 2: Fetch each image file by ID
         const imagePromises = imageIds.map(async (id: number) => {
