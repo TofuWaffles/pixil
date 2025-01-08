@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 
@@ -20,12 +21,15 @@ func main() {
 	}
 	defer dbpool.Close()
 
-	env := handlers.Env{Database: dbpool}
+	env := handlers.Env{
+		Database: dbpool,
+		Logger:   slog.Default(),
+	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handlers.Home)
 	mux.HandleFunc("/all-active-media", env.AllActiveMediaIds)
-	mux.HandleFunc("/thumbnail", handlers.Chain(env.Thumbnail, handlers.Logging()))
+	mux.HandleFunc("/thumbnail", handlers.Chain(env.Thumbnail, env.Logging()))
 	mux.HandleFunc("/upload-test", env.UploadTest)
 	mux.HandleFunc("/download-test", handlers.DownloadTest)
 

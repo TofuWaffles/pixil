@@ -9,6 +9,7 @@ import (
 	"image/png"
 	"io"
 	"log"
+	"log/slog"
 	"mime"
 	"mime/multipart"
 	"net/http"
@@ -23,9 +24,13 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// Used to pass data that typically needs to be accessed by all handlers like database connections and loggers.
 type Env struct {
 	Database *pgxpool.Pool
+	Logger   *slog.Logger
 }
+
+const genericErrMsg = "Something went wrong when trying serve the request"
 
 func Home(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello from Seallove!"))
@@ -34,12 +39,11 @@ func Home(w http.ResponseWriter, r *http.Request) {
 func (e Env) AllActiveMediaIds(w http.ResponseWriter, r *http.Request) {
 	media, err := models.GetAllActiveMedia(r.Context(), e.Database)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Error trying to all active media", "error", err.Error())
 		return
 	}
 
-	fmt.Println(media)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(media)
@@ -49,20 +53,24 @@ func (e Env) Media(w http.ResponseWriter, r *http.Request) {
 	id, err := utils.IdFromParam(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		e.Logger.Error("Error trying to parse ID form parameter", "error", err.Error())
 		return
 	}
 
 	media, err := models.GetMedia(r.Context(), e.Database, id)
 	if err != nil {
-		http.Error(w, "error fetching media: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Error trying to get media information from the database", "error", err.Error())
 		return
 	}
 
 	file, err := os.Open(media.Filepath)
 	if err != nil {
-		http.Error(w, "error opening file: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Error trying to open media file", "error", err.Error())
 		return
 	}
+	defer file.Close()
 
 	mimeType := mime.TypeByExtension(filepath.Ext(media.Filepath))
 	if mimeType == "" {
@@ -71,8 +79,8 @@ func (e Env) Media(w http.ResponseWriter, r *http.Request) {
 
 	fileBytes, err := io.ReadAll(file)
 	if err != nil {
-		file.Close()
-		http.Error(w, "error reading file: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Error trying to read the file into bytes", "error", err.Error())
 		return
 	}
 
@@ -85,6 +93,8 @@ func (e Env) Media(w http.ResponseWriter, r *http.Request) {
 	_, err = w.Write(fileBytes)
 	if err != nil {
 		log.Printf("error writing response: %v", err)
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Error trying to send file bytes in response", "error", err.Error())
 	}
 }
 
@@ -92,18 +102,21 @@ func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	id, err := utils.IdFromParam(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		e.Logger.Error("Error trying to parse ID from the request parameter", "error", err.Error())
 		return
 	}
 
 	media, err := models.GetMedia(r.Context(), e.Database, id)
 	if err != nil {
-		http.Error(w, "error fetching media: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Error trying to get media information from the database", "error", err.Error())
 		return
 	}
 
 	file, err := os.Open(media.Filepath)
 	if err != nil {
-		http.Error(w, "error opening file: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Error trying to open file", "error", err.Error())
 		return
 	}
 	defer file.Close()
@@ -119,29 +132,31 @@ func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err != nil {
-		http.Error(w, "error decoding image: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Error trying to decode the file", "error", err.Error())
 		return
 	}
 
 	var buf bytes.Buffer
 	err = jpeg.Encode(&buf, img, &jpeg.Options{Quality: 50})
 	if err != nil {
-		http.Error(w, "error encoding thumbnail: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Error trying to encode the thumbnail", "error", err.Error())
 		return
 	}
 
 	w.Header().Set("Content-Type", "image/jpeg")
 	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
-	w.WriteHeader(http.StatusOK)
 
+	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(buf.Bytes())
 	if err != nil {
-		log.Printf("error writing response: %v", err)
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Error trying to write the thumbnail contents to the response", "error", err.Error())
 	}
 }
 
 func (e Env) UploadTest(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Uploading Canny...")
 	r.ParseMultipartForm(32 << 20)
 
 	file, header, err := r.FormFile("file")
@@ -179,8 +194,6 @@ func (e Env) UploadTest(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	fmt.Println("Done uploading Canny!")
-
 	return
 }
 
@@ -190,7 +203,6 @@ func DownloadTest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("Downloading Canny...")
 	mw := multipart.NewWriter(w)
 	w.Header().Set("Content-Type", mw.FormDataContentType())
 
@@ -229,5 +241,4 @@ func DownloadTest(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	fmt.Println("Downloaded Canny")
 }

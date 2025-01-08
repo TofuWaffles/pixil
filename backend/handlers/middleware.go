@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"time"
 )
@@ -16,12 +15,23 @@ func Chain(f http.HandlerFunc, middleware ...Middleware) http.HandlerFunc {
 	return f
 }
 
-func Logging() Middleware {
+// Allows addtional chaining of pre-chained middleware
+func (e Env) WrapMiddleware(http.HandlerFunc) Middleware {
+	return func(f http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			f(w, r)
+		}
+	}
+}
+
+// Logs access and execution time of a handler
+func (e Env) Logging() Middleware {
 	return func(f http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			start := time.Now()
+			e.Logger.Info("Serving", "path", r.URL.Path, "remote_addr", r.RemoteAddr, "started_at", start)
 			defer func() {
-				log.Println(r.URL.Path, time.Since(start))
+				e.Logger.Info("Finished serving", "path", r.URL.Path, "remote_addr", r.RemoteAddr, "finished_in", time.Since(start))
 			}()
 
 			f(w, r)
