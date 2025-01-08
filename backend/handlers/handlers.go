@@ -49,6 +49,7 @@ func (e Env) Media(w http.ResponseWriter, r *http.Request) {
 	id, err := utils.IdFromParam(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	media, err := models.GetMedia(r.Context(), e.Database, id)
@@ -88,15 +89,9 @@ func (e Env) Media(w http.ResponseWriter, r *http.Request) {
 }
 
 func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
-	idParam := r.URL.Query().Get("id")
-	if idParam == "" {
-		http.Error(w, "missing 'id' query parameter", http.StatusBadRequest)
-		return
-	}
-
-	id, err := strconv.Atoi(idParam)
+	id, err := utils.IdFromParam(r)
 	if err != nil {
-		http.Error(w, "invalid 'id' query parameter", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
