@@ -1,8 +1,8 @@
-import React from 'react';
-import { Box, Toolbar } from '@mui/material';
+import { Box } from '@mui/material';
 import MainDrawer from './navbar';
+import { Outlet } from 'react-router-dom';
 
-const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export default function MainLayout() {
   const drawerWidth = 240;
 
   return (
@@ -20,12 +20,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         }}
       >
         {/* Spacer for AppBar (optional) */}
-        <Toolbar />
-        {children}
+        <Outlet />
       </Box>
     </Box>
   );
 };
-
-export default Layout;
-
