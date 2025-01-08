@@ -1,4 +1,5 @@
 import React from "react";
+import Thumbnail from "./Thumbnail";
 
 /// USE THIS AS REFERENCE ONLY
 export function DisplayImages() {
@@ -53,11 +54,7 @@ export function DisplayImages() {
       <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
         {images.map((image) => (
           <div key={image.id}>
-            <img
-              src={image.src}
-              alt={`Image ID ${image.id}`}
-              style={{ width: "200px", height: "200px", objectFit: "cover" }}
-            />
+            <Thumbnail src={image.src} />
             <p>ID: {image.id}</p>
           </div>
         ))}
