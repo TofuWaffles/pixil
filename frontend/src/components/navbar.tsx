@@ -135,7 +135,7 @@ export default function MainDrawer() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Mini variant drawer
+            Pixil
           </Typography>
         </Toolbar>
       </AppBar>

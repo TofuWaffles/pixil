@@ -1,7 +1,7 @@
-import MainDrawer from "./components/navbar"
+import AppRoutes from "./routes"
 
 export default function App() {
   return (
-    <MainDrawer></MainDrawer>
+    <AppRoutes></AppRoutes>
   )
 }
