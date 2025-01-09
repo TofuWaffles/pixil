@@ -32,6 +32,7 @@ type Env struct {
 }
 
 const genericErrMsg = "Something went wrong when trying serve the request"
+const mediaDir = "/pixil-media/"
 
 func Home(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello from Seallove!"))
@@ -69,7 +70,9 @@ func (e Env) Media(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	file, err := os.Open(media.Filepath)
+	mediaFp := filepath.Join(mediaDir, media.FileName)
+
+	file, err := os.Open(mediaFp)
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
 		e.Logger.Error("Error trying to open media file", "error", err.Error())
@@ -77,7 +80,7 @@ func (e Env) Media(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	mimeType := mime.TypeByExtension(filepath.Ext(media.Filepath))
+	mimeType := mime.TypeByExtension(filepath.Ext(media.FileName))
 	if mimeType == "" {
 		mimeType = "application/octet-stream"
 	}
@@ -123,7 +126,8 @@ func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	file, err := os.Open(media.Filepath)
+	mediaFp := filepath.Join(mediaDir, media.FileName)
+	file, err := os.Open(mediaFp)
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
 		e.Logger.Error("Error trying to open file", "error", err.Error())
@@ -132,7 +136,7 @@ func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 
 	var img image.Image
-	switch filepath.Ext(media.Filepath) {
+	switch filepath.Ext(media.FileName) {
 	case ".png":
 		img, err = png.Decode(file)
 	case ".jpg", ".jpeg":
@@ -181,7 +185,8 @@ func (e Env) UploadTest(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	path := filepath.Join(dir, filepath.Base(header.Filename))
+	fileName := filepath.Clean(header.Filename)
+	path := filepath.Join(dir, filepath.Base(fileName))
 	dst, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		panic(err)
@@ -193,7 +198,7 @@ func (e Env) UploadTest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	media := models.Media{
-		Filepath:   path,
+		FileName:   fileName,
 		OwnerEmail: "",
 		FileType:   filepath.Ext(path),
 		Status:     models.Active,

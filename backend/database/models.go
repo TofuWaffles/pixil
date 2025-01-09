@@ -23,7 +23,7 @@ const (
 
 type Media struct {
 	Id         int       `json:"id"`
-	Filepath   string    `json:"filepath"`
+	FileName   string    `json:"fileName"`
 	OwnerEmail string    `json:"ownerEmail"`
 	FileType   string    `json:"fileType"`
 	Status     int       `json:"status"`
@@ -63,7 +63,7 @@ func AddUser(ctx context.Context, db *pgxpool.Pool, user User) error {
 
 func GetMedia(ctx context.Context, db *pgxpool.Pool, id int) (Media, error) {
 	rows, err := db.Query(ctx,
-		`SELECT id, filepath, owner_email, file_type, status, created_at
+		`SELECT id, file_name, owner_email, file_type, status, created_at
 		FROM media
 		WHERE id = $1
 		LIMIT 1
@@ -79,7 +79,7 @@ func GetMedia(ctx context.Context, db *pgxpool.Pool, id int) (Media, error) {
 
 func GetAllMedia(ctx context.Context, db *pgxpool.Pool, status int) ([]Media, error) {
 	rows, _ := db.Query(ctx,
-		`SELECT id, filepath, owner_email, file_type, status, created_at
+		`SELECT id, file_name, owner_email, file_type, status, created_at
 		FROM media
 		WHERE status = $1`,
 		status,
@@ -96,9 +96,9 @@ func GetAllMedia(ctx context.Context, db *pgxpool.Pool, status int) ([]Media, er
 
 func AddMedia(ctx context.Context, db *pgxpool.Pool, media Media) error {
 	_, err := db.Exec(ctx,
-		`INSERT INTO media (filepath, owner_email, file_type, status, created_at)
+		`INSERT INTO media (file_name, owner_email, file_type, status, created_at)
 		VALUES ($1, $2, $3, $4, NOW())`,
-		media.Filepath,
+		media.FileName,
 		media.OwnerEmail,
 		media.FileType,
 		media.Status,
