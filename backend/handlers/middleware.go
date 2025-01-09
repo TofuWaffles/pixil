@@ -9,7 +9,7 @@ import (
 type Middleware func(http.HandlerFunc) http.HandlerFunc
 
 // Chains together multiple middleware ending with a handler.
-func Chain(f http.HandlerFunc, middleware ...Middleware) http.HandlerFunc {
+func (e Env) Chain(f http.HandlerFunc, middleware ...Middleware) http.HandlerFunc {
 	for _, m := range middleware {
 		f = m(f)
 	}
@@ -20,7 +20,7 @@ func Chain(f http.HandlerFunc, middleware ...Middleware) http.HandlerFunc {
 // Basic chain providing middleware that should be used by most if not all handlers.
 func (e Env) BasicChain(f http.HandlerFunc) http.HandlerFunc {
 	timeout := time.Duration(60 * float64(time.Second))
-	return Chain(f, e.Logging(), e.Timeout(timeout))
+	return e.Chain(f, e.Logging(), e.Timeout(timeout))
 }
 
 // Logs access and execution time of a handler.
@@ -51,6 +51,34 @@ func (e Env) Timeout(timeout time.Duration) Middleware {
 				}
 			}()
 			r = r.WithContext(ctx)
+
+			f(w, r)
+		}
+	}
+}
+
+func (e Env) GetOnly() Middleware {
+	return func(f http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			if r.Method != "" && r.Method != "GET" {
+				http.Error(w, "Only GET requests are allowed for this path.", http.StatusBadRequest)
+				e.Logger.Error("Non-GET method used on request", "method", r.Method)
+				return
+			}
+
+			f(w, r)
+		}
+	}
+}
+
+func (e Env) PostOnly() Middleware {
+	return func(f http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			if r.Method != "" && r.Method != "POST" {
+				http.Error(w, "Only GET requests are allowed for this path.", http.StatusBadRequest)
+				e.Logger.Error("Non-GET method used on request", "method", r.Method)
+				return
+			}
 
 			f(w, r)
 		}
