@@ -11,7 +11,6 @@ import (
 type User struct {
 	Email        string `json:"email"`
 	Username     string `json:"username"`
-	PasswordSalt string `json:"passwordSalt"`
 	PasswordHash string `json:"passwordHash"`
 }
 
@@ -36,26 +35,22 @@ type Tag struct {
 }
 
 func GetUser(ctx context.Context, db *pgxpool.Pool, email string) (User, error) {
-	row := db.QueryRow(ctx,
-		`SELECT email, username, password_salt, password_hash
+	rows, _ := db.Query(ctx,
+		`SELECT email, username, password_hash
 		FROM user
 		WHERE email = $1`,
 		email,
 	)
 
-	user := User{}
-	err := row.Scan(user.Email, user.Username, user.PasswordSalt, user.PasswordHash)
-
-	return user, err
+	return pgx.CollectOneRow(rows, pgx.RowToStructByName[User])
 }
 
 func AddUser(ctx context.Context, db *pgxpool.Pool, user User) error {
 	_, err := db.Exec(ctx,
-		`INSERT INTO user (email, username, password_salt, password_hash)
+		`INSERT INTO user (email, username, password_hash)
 		VALUES ($1, $2, $3, $4)`,
 		user.Email,
 		user.Username,
-		user.PasswordSalt,
 		user.PasswordHash,
 	)
 	return err
