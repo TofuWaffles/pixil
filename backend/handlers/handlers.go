@@ -38,6 +38,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello from Seallove!"))
 }
 
+// Gets all active media.
 func (e Env) AllActiveMedia(w http.ResponseWriter, r *http.Request) {
 	media, err := models.GetAllMedia(r.Context(), e.Database, models.Active)
 	if err != nil {
@@ -51,6 +52,7 @@ func (e Env) AllActiveMedia(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(media)
 }
 
+// Get a media with the ID specified in the URL parameter.
 func (e Env) Media(w http.ResponseWriter, r *http.Request) {
 	id, err := utils.IdFromParam(r)
 	if err != nil {
@@ -106,6 +108,7 @@ func (e Env) Media(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Get a thumbnail of a media with the ID specified in the URL parameter.
 func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	id, err := utils.IdFromParam(r)
 	if err != nil {
