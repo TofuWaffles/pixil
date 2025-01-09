@@ -9,7 +9,6 @@ export default function AppRoutes() {
       <Routes>
         <Route path="/" element={<MainLayout />}>
           <Route path="" element={<Home />} />
-          <Route path="nest" element={<Settings />} />
         </Route>
         <Route path="/settings" element={<Settings />} />
       </Routes>

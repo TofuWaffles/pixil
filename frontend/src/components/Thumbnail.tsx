@@ -1,16 +1,13 @@
 import { Box } from '@mui/material';
+import { Thumbnail } from '../types/props';
 
-interface ThumbnailProps {
-  src: string;
-}
-
-export default function Thumbnail({ src }: ThumbnailProps) {
+export default function ThumbnailBox(thumbnail: Thumbnail) {
   return (
     <Box
-      className="size-24 md:size-48"
+      className="size-24 md:size-48 border-2 border-french-gray-2"
       component="img"
       alt="User Image."
-      src={src}
+      src={thumbnail.src}
     />
   );
 }
