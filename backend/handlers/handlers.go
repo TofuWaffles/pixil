@@ -197,7 +197,7 @@ func (e Env) UploadTest(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func DownloadTest(w http.ResponseWriter, r *http.Request) {
+func (e Env) DownloadTest(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "OPTIONS" {
 		w.WriteHeader(http.StatusOK)
 		return

@@ -27,11 +27,11 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", handlers.Home)
-	mux.HandleFunc("/all-active-media", env.AllActiveMediaIds)
-	mux.HandleFunc("/thumbnail", handlers.Chain(env.Thumbnail, env.Logging()))
-	mux.HandleFunc("/upload-test", env.UploadTest)
-	mux.HandleFunc("/download-test", handlers.DownloadTest)
+	mux.HandleFunc("/", env.BasicChain(handlers.Home))
+	mux.HandleFunc("/all-active-media", env.BasicChain(env.AllActiveMediaIds))
+	mux.HandleFunc("/thumbnail", env.BasicChain(env.Thumbnail))
+	mux.HandleFunc("/upload-test", env.BasicChain(env.UploadTest))
+	mux.HandleFunc("/download-test", env.BasicChain(env.DownloadTest))
 
 	log.Println("Starting server on :4000")
 

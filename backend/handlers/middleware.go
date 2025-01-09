@@ -16,13 +16,10 @@ func Chain(f http.HandlerFunc, middleware ...Middleware) http.HandlerFunc {
 	return f
 }
 
-// Allows addtional chaining of pre-chained middleware
-func (e Env) WrapMiddleware(http.HandlerFunc) Middleware {
-	return func(f http.HandlerFunc) http.HandlerFunc {
-		return func(w http.ResponseWriter, r *http.Request) {
-			f(w, r)
-		}
-	}
+// Basic chain providing middleware that should be used by most if not all handlers
+func (e Env) BasicChain(f http.HandlerFunc) http.HandlerFunc {
+	timeout := time.Duration(60 * float64(time.Second))
+	return Chain(f, e.Logging(), e.Timeout(timeout))
 }
 
 // Logs access and execution time of a handler
