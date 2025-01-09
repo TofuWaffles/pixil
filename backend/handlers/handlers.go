@@ -21,6 +21,7 @@ import (
 
 	"github.com/TofuWaffles/pixil/database"
 	"github.com/TofuWaffles/pixil/utils"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -36,8 +37,8 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello from Seallove!"))
 }
 
-func (e Env) AllActiveMediaIds(w http.ResponseWriter, r *http.Request) {
-	media, err := models.GetAllActiveMedia(r.Context(), e.Database)
+func (e Env) AllActiveMedia(w http.ResponseWriter, r *http.Request) {
+	media, err := models.GetAllMedia(r.Context(), e.Database, models.Active)
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
 		e.Logger.Error("Error trying to all active media", "error", err.Error())
@@ -59,8 +60,12 @@ func (e Env) Media(w http.ResponseWriter, r *http.Request) {
 
 	media, err := models.GetMedia(r.Context(), e.Database, id)
 	if err != nil {
-		http.Error(w, genericErrMsg, http.StatusInternalServerError)
-		e.Logger.Error("Error trying to get media information from the database", "error", err.Error())
+		if err == pgx.ErrNoRows {
+			http.Error(w, "Media with this ID was not found.", http.StatusNotFound)
+		} else {
+			http.Error(w, genericErrMsg, http.StatusInternalServerError)
+			e.Logger.Error("Error trying to get media information from the database", "error", err.Error())
+		}
 		return
 	}
 
@@ -108,8 +113,13 @@ func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
 
 	media, err := models.GetMedia(r.Context(), e.Database, id)
 	if err != nil {
-		http.Error(w, genericErrMsg, http.StatusInternalServerError)
-		e.Logger.Error("Error trying to get media information from the database", "error", err.Error())
+		if err == pgx.ErrNoRows {
+			http.Error(w, "Media with this ID was not found.", http.StatusNotFound)
+			e.Logger.Error("Media with given ID was not found", "id", id)
+		} else {
+			http.Error(w, genericErrMsg, http.StatusInternalServerError)
+			e.Logger.Error("Error trying to get media information from the database", "error", err.Error())
+		}
 		return
 	}
 

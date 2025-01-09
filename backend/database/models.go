@@ -74,19 +74,19 @@ func GetMedia(ctx context.Context, db *pgxpool.Pool, id int) (Media, error) {
 		return Media{}, err
 	}
 
-	return pgx.CollectOneRow(rows, pgx.RowToStructByPos[Media])
+	return pgx.CollectOneRow(rows, pgx.RowToStructByName[Media])
 }
 
-func GetAllActiveMedia(ctx context.Context, db *pgxpool.Pool) ([]Media, error) {
+func GetAllMedia(ctx context.Context, db *pgxpool.Pool, status int) ([]Media, error) {
 	rows, _ := db.Query(ctx,
 		`SELECT id, filepath, owner_email, file_type, status, created_at
 		FROM media
 		WHERE status = $1`,
-		Active,
+		status,
 	)
 	defer rows.Close()
 
-	media, err := pgx.CollectRows(rows, pgx.RowToStructByPos[Media])
+	media, err := pgx.CollectRows(rows, pgx.RowToStructByName[Media])
 	if err != nil {
 		return []Media{}, err
 	}
