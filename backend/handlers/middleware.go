@@ -20,7 +20,7 @@ func (e Env) Chain(f http.HandlerFunc, middleware ...Middleware) http.HandlerFun
 // Basic chain providing middleware that should be used by most if not all handlers.
 func (e Env) BasicChain(f http.HandlerFunc) http.HandlerFunc {
 	timeout := time.Duration(60 * float64(time.Second))
-	return e.Chain(f, e.Logging(), e.Timeout(timeout))
+	return e.Chain(f, e.AllowCORS("http://127.0.0.1:3000"), e.Logging(), e.Timeout(timeout))
 }
 
 // Logs access and execution time of a handler.
@@ -53,6 +53,29 @@ func (e Env) Timeout(timeout time.Duration) Middleware {
 			r = r.WithContext(ctx)
 
 			f(w, r)
+		}
+	}
+}
+
+// AllowCORS is a middleware that enables CORS for requests coming from a specific origin.
+func (e Env) AllowCORS(allowedOrigin string) Middleware {
+	return func(next http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			origin := r.Header.Get("Origin")
+			if origin == allowedOrigin {
+				w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
+				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+				w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+				w.Header().Set("Access-Control-Allow-Credentials", "true")
+			}
+
+			// Handle preflight request
+			if r.Method == http.MethodOptions {
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+
+			next(w, r)
 		}
 	}
 }
