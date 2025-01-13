@@ -1,9 +1,10 @@
-import React from "react";
-import ThumbnailBox from "./Thumbnail";
+import React, { ReactElement } from "react";
+import ThumbnailGroup from "./ThumbnailGroup";
+import { Thumbnail } from "../types/props";
 
 /// USE THIS AS REFERENCE ONLY
 export function DisplayImages() {
-  const [images, setImages] = React.useState<{ id: number; src: string }[]>([]);
+  const [images, setImages] = React.useState<{ id: number; createdAt: Date; src: string }[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -17,23 +18,25 @@ export function DisplayImages() {
         }
 
         const imageList = await response.json(); // Assuming the API returns an array of objects like [{ Id: 1 }, { Id: 2 }]
-        const imageIds = imageList.map((item: { id: number }) => item.id);
+        const media = imageList.map((item: { id: number, createdAt: string }) => { return { id: item.id, createdAt: new Date(item.createdAt) } });
+        console.log(media);
+
 
         // Step 2: Fetch each image file by ID
-        const imagePromises = imageIds.map(async (id: number) => {
-          const imageResponse = await fetch(`http://127.0.0.1:4000/thumbnail?id=${id}`);
+        const imagePromises = media.map(async (m: Thumbnail) => {
+          const imageResponse = await fetch(`http://127.0.0.1:4000/thumbnail?id=${m.id}`);
           if (!imageResponse.ok) {
-            throw new Error(`Error fetching image with ID ${id}: ${imageResponse.statusText}`);
+            throw new Error(`Error fetching image with ID ${m.id}: ${imageResponse.statusText}`);
           }
 
           const imageBlob = await imageResponse.blob();
           const imageUrl = URL.createObjectURL(imageBlob); // Create a temporary URL for the image
-          return { id, src: imageUrl };
+          return { id: m.id, createdAt: m.createdAt, src: imageUrl };
         });
 
         // Wait for all image fetches to complete
-        const fetchedImages = await Promise.all(imagePromises);
-        setImages(fetchedImages);
+        const thumbnails = await Promise.all(imagePromises);
+        setImages(thumbnails);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -48,16 +51,37 @@ export function DisplayImages() {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
+  let thumbnailGroups: Map<Date, Thumbnail[]> = new Map();
+
+  images.forEach((image) => {
+    let date = image.createdAt
+    date.setHours(0, 0, 0, 0)
+    if (!thumbnailGroups.has(date)) {
+      thumbnailGroups.set(date, [])
+    }
+    thumbnailGroups.get(date)!.push(image)
+  })
+  console.log(thumbnailGroups);
+
+  let thumbnailGroupComps: ReactElement[] = [];
+  const options = {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
+  thumbnailGroups.forEach((images, date) => {
+    thumbnailGroupComps.push(
+      <ThumbnailGroup title={date.toLocaleString('en-US', options)} thumbnails={images} />
+    )
+  })
+
+
   return (
     <div>
       <h1>Available Images</h1>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-        {images.map((image) => (
-          <div key={image.id}>
-            <ThumbnailBox src={image.src} />
-            <p>ID: {image.id}</p>
-          </div>
-        ))}
+        {thumbnailGroupComps}
       </div>
     </div>
   );
