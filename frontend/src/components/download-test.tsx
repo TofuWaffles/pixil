@@ -51,15 +51,17 @@ export function DisplayImages() {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  let thumbnailGroups: Map<Date, Thumbnail[]> = new Map();
+  let thumbnailGroups: Map<number, Thumbnail[]> = new Map();
 
   images.forEach((image) => {
     let date = image.createdAt
     date.setHours(0, 0, 0, 0)
-    if (!thumbnailGroups.has(date)) {
-      thumbnailGroups.set(date, [])
+    let unix_time = Math.floor(date.getTime() / 1000)
+
+    if (!thumbnailGroups.has(unix_time)) {
+      thumbnailGroups.set(unix_time, [])
     }
-    thumbnailGroups.get(date)!.push(image)
+    thumbnailGroups.get(unix_time)!.push(image)
   })
   console.log(thumbnailGroups);
 
@@ -70,9 +72,9 @@ export function DisplayImages() {
     month: "long",
     day: "numeric",
   };
-  thumbnailGroups.forEach((images, date) => {
+  thumbnailGroups.forEach((images, _) => {
     thumbnailGroupComps.push(
-      <ThumbnailGroup title={date.toLocaleString('en-US', options)} thumbnails={images} />
+      <ThumbnailGroup title={images[0].createdAt.toLocaleString('en-US', options)} thumbnails={images} />
     )
   })
 
