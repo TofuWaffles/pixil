@@ -1,6 +1,7 @@
 import { Box } from '@mui/material';
 import MainDrawer from './Navbar';
 import { Outlet } from 'react-router-dom';
+import MyDrawer from './MyNavbar';
 
 export default function MainLayout() {
   const drawerWidth = 240;
