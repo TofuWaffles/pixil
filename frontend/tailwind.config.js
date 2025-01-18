@@ -1,26 +1,27 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-    content: [
-        "./index.html",
-        "./src/**/*.{html,js,jsx,ts,tsx}",
-    ],
-    theme: {
-        colors: {
-            "seasalt": "#F8F9FA",
-            "anti-flash-white": "#E9ECEF",
-            "platinum": "#DEE2E6",
-            "french-gray-1": "#CED4DA",
-            "french-gray-2": "#ADB5BD",
-            "slate-gray": "#6C757D",
-            "outer-space": "#495057",
-            "onyx": "#343A40",
-            "eerie-black": "#212529",
-        },
-        fontFamily: {
-            
-        },
-        extend: {},
+  content: [
+    "./index.html",
+    "./src/**/*.{html,js,jsx,ts,tsx}",
+  ],
+  theme: {
+    colors: {
+      "primary-main": "#dda25e",
+      "primary-light": "#f0d6b6",
+      "primary-dark": "#d17f2f",
+      "primary-contrast": "#000000",
+      "secondary-main": "#b2cf33",
+      "secondary-light": "#c6e558",
+      "secondary-dark": "#93a121",
+      "secondary-contrast": "#000000",
+      "background-main": "#fefae0",
+      "background-dark": "#fbf1b8"
     },
-    plugins: [],
+    fontFamily: {
+      // Add your font families here if needed
+    },
+    extend: {},
+  },
+  plugins: [],
 }
 

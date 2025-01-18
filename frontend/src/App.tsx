@@ -17,7 +17,11 @@ export default function App() {
         dark: "#93a121",
         contrastText: "#000000",
       },
-    }
+      background: {
+        default: "#fefae0",
+        paper: "#fbf1b8"
+      }
+    },
   });
   return (
     <ThemeProvider theme={theme}>
