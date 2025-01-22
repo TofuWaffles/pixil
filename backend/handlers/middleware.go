@@ -20,7 +20,7 @@ func (e Env) Chain(f http.HandlerFunc, middleware ...Middleware) http.HandlerFun
 // Basic chain providing middleware that should be used by most if not all handlers.
 func (e Env) BasicChain(f http.HandlerFunc) http.HandlerFunc {
 	timeout := time.Duration(60 * float64(time.Second))
-	return e.Chain(f, e.AllowCORS("http://127.0.0.1:3000"), e.Logging(), e.Timeout(timeout))
+	return e.Chain(f, e.AllowCORS("http://localhost:3000"), e.Logging(), e.Timeout(timeout))
 }
 
 // Logs access and execution time of a handler.
