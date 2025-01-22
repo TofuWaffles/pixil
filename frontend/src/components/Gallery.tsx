@@ -1,9 +1,8 @@
 import React, { ReactElement } from "react";
-import ThumbnailGroup from "./ThumbnailGroup";
 import { Thumbnail } from "../types/props";
+import ThumbnailGroup from "./ThumbnailGroup";
 
-/// USE THIS AS REFERENCE ONLY
-export function DisplayImages() {
+export function Gallery() {
   const [images, setImages] = React.useState<{ id: number; createdAt: Date; src: string }[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -11,20 +10,18 @@ export function DisplayImages() {
   React.useEffect(() => {
     const fetchImages = async () => {
       try {
-        // Step 1: Fetch image IDs
-        const response = await fetch("http://127.0.0.1:4000/all-active-media");
+        const response = await fetch(process.env.BACKEND_URL + "/all-active-media");
         if (!response.ok) {
           throw new Error(`Error fetching image IDs: ${response.statusText}`);
         }
 
-        const imageList = await response.json(); // Assuming the API returns an array of objects like [{ Id: 1 }, { Id: 2 }]
+        const imageList = await response.json();
         const media = imageList.map((item: { id: number, createdAt: string }) => { return { id: item.id, createdAt: new Date(item.createdAt) } });
         console.log(media);
 
 
-        // Step 2: Fetch each image file by ID
         const imagePromises = media.map(async (m: Thumbnail) => {
-          const imageResponse = await fetch(`http://127.0.0.1:4000/thumbnail?id=${m.id}`);
+          const imageResponse = await fetch(process.env.BACKEND_URL + `/thumbnail?id=${m.id}`);
           if (!imageResponse.ok) {
             throw new Error(`Error fetching image with ID ${m.id}: ${imageResponse.statusText}`);
           }
@@ -42,12 +39,11 @@ export function DisplayImages() {
       } finally {
         setLoading(false);
       }
-    };
+    }
 
     fetchImages();
   }, []);
 
-  // Step 3: Render the images
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -66,26 +62,21 @@ export function DisplayImages() {
   console.log(thumbnailGroups);
 
   let thumbnailGroupComps: ReactElement[] = [];
-  const options = {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  };
   thumbnailGroups.forEach((images, _) => {
     thumbnailGroupComps.push(
-      <ThumbnailGroup title={images[0].createdAt.toLocaleString('en-US', options)} thumbnails={images} />
+      <ThumbnailGroup title={images[0].createdAt.toLocaleString('en-US', {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })} thumbnails={images} />
     )
   })
-
-
   return (
     <div>
-      <h1>Available Images</h1>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
         {thumbnailGroupComps}
       </div>
     </div>
   );
 }
-

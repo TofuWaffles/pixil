@@ -1,11 +1,11 @@
 import Box from "@mui/material/Box/Box";
 import UploadAndDisplayImage from "../components/upload-button";
-import { DisplayImages } from "../components/download-test";
+import { Gallery } from "../components/Gallery";
 
 export function Home() {
   return (
     <Box>
-      <DisplayImages></DisplayImages>
+      <Gallery></Gallery>
       <UploadAndDisplayImage></UploadAndDisplayImage>
     </Box>
   )
