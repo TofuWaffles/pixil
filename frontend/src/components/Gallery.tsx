@@ -10,7 +10,7 @@ export function Gallery() {
   React.useEffect(() => {
     const fetchImages = async () => {
       try {
-        const response = await fetch(process.env.BACKEND_URL + "/all-active-media");
+        const response = await fetch(import.meta.env.VITE_BACKEND_URL + "/all-active-media");
         if (!response.ok) {
           throw new Error(`Error fetching image IDs: ${response.statusText}`);
         }
@@ -21,13 +21,13 @@ export function Gallery() {
 
 
         const imagePromises = media.map(async (m: Thumbnail) => {
-          const imageResponse = await fetch(process.env.BACKEND_URL + `/thumbnail?id=${m.id}`);
+          const imageResponse = await fetch(import.meta.env.VITE_BACKEND_URL + `/thumbnail?id=${m.id}`);
           if (!imageResponse.ok) {
             throw new Error(`Error fetching image with ID ${m.id}: ${imageResponse.statusText}`);
           }
 
           const imageBlob = await imageResponse.blob();
-          const imageUrl = URL.createObjectURL(imageBlob); // Create a temporary URL for the image
+          const imageUrl = URL.createObjectURL(imageBlob);
           return { id: m.id, createdAt: m.createdAt, src: imageUrl };
         });
 
