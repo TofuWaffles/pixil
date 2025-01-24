@@ -12,7 +12,7 @@ export default function ThumbnailGroup({ title, thumbnails }: { title: string, t
   })
   return (
     <div className="lg: size-9/12">
-      <h1>{title}</h1>
+      <h1 className="font-bold p-2 text-lg">{title}</h1>
       < Grid2 container direction="row" spacing={1}>
         {tboxes}
       </Grid2 >
