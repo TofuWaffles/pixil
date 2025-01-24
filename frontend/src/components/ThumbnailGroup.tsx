@@ -3,10 +3,11 @@ import { Thumbnail } from "../types/props";
 import ThumbnailBox from "./Thumbnail";
 
 export default function ThumbnailGroup({ title, thumbnails }: { title: string, thumbnails: Thumbnail[] }) {
-  let tboxes = thumbnails.map((t) => {
-    return (<Grid2 className="size-fit">
-      <ThumbnailBox thumbnail={t} />
-    </Grid2>
+  let tboxes = thumbnails.map((value, key) => {
+    return (
+      <Grid2 key={key} className="size-fit">
+        <ThumbnailBox thumbnail={value} />
+      </Grid2>
     )
   })
   return (

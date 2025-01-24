@@ -1,6 +1,7 @@
 import React, { ReactElement } from "react";
 import { Thumbnail } from "../types/props";
 import ThumbnailGroup from "./ThumbnailGroup";
+import { List, ListItem } from "@mui/material";
 
 export function Gallery() {
   const [images, setImages] = React.useState<{ id: number; createdAt: Date; src: string }[]>([]);
@@ -61,21 +62,25 @@ export function Gallery() {
   })
   console.log(thumbnailGroups);
 
-  let thumbnailGroupComps: ReactElement[] = [];
-  thumbnailGroups.forEach((images, _) => {
-    thumbnailGroupComps.push(
-      <ThumbnailGroup title={images[0].createdAt.toLocaleString('en-US', {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })} thumbnails={images} />
+  let thumbnailGroupComponents: ReactElement[] = [];
+  thumbnailGroups.forEach((images, key) => {
+    thumbnailGroupComponents.push(
+      <ListItem key={key}>
+        <ThumbnailGroup title={images[0].createdAt.toLocaleString('en-US', {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })} thumbnails={images} />
+      </ListItem>
     )
   })
   return (
     <div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-        {thumbnailGroupComps}
+        <List sx={{ width: "100%" }}>
+          {thumbnailGroupComponents}
+        </List>
       </div>
     </div>
   );
