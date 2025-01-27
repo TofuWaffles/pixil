@@ -10,9 +10,9 @@ export default {
       "primary-light": "#f0d6b6",
       "primary-dark": "#d17f2f",
       "primary-contrast": "#000000",
-      "secondary-main": "#b2cf33",
-      "secondary-light": "#c6e558",
-      "secondary-dark": "#93a121",
+      "secondary-main": "#5e99dd",
+      "secondary-light": "#81b7e7",
+      "secondary-dark": "#4d7abd",
       "secondary-contrast": "#000000",
       "background-main": "#fefae0",
       "background-dark": "#fbf1b8"
