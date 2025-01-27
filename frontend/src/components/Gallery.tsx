@@ -63,7 +63,7 @@ export function Gallery() {
   console.log(thumbnailGroups);
 
   let thumbnailGroupComponents: ReactElement[] = [];
-  thumbnailGroups.forEach((images, key) => {
+  new Map([...thumbnailGroups].sort((a, b) => { return b[0] - a[0] })).forEach((images, key) => {
     thumbnailGroupComponents.push(
       <ListItem key={key}>
         <ThumbnailGroup title={images[0].createdAt.toLocaleString('en-US', {
