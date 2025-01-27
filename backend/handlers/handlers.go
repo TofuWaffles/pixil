@@ -47,47 +47,6 @@ func (e Env) AllActiveMedia(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(media)
 }
 
-// Get a media with the ID specified in the URL parameter.
-func (e Env) GetMedia(w http.ResponseWriter, r *http.Request) {
-	id, err := utils.IdFromParam(r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		e.Logger.Error("Error trying to parse ID from the request parameter", "error", err.Error())
-		return
-	}
-
-	img, err := utils.LoadImage(r.Context(), e.Database, id)
-
-	if err != nil {
-		if err == pgx.ErrNoRows {
-			http.Error(w, "Media with this ID was not found.", http.StatusNotFound)
-			e.Logger.Error("Media with given ID was not found", "id", id)
-		} else {
-			http.Error(w, genericErrMsg, http.StatusInternalServerError)
-			e.Logger.Error("Error trying to load image", "error", err.Error())
-		}
-		return
-	}
-
-	var buf bytes.Buffer
-	err = jpeg.Encode(&buf, img, &jpeg.Options{Quality: 100})
-	if err != nil {
-		http.Error(w, genericErrMsg, http.StatusInternalServerError)
-		e.Logger.Error("Error trying to encode the image", "error", err.Error())
-		return
-	}
-
-	w.Header().Set("Content-Type", "image/jpeg")
-	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
-
-	w.WriteHeader(http.StatusOK)
-	_, err = w.Write(buf.Bytes())
-	if err != nil {
-		http.Error(w, genericErrMsg, http.StatusInternalServerError)
-		e.Logger.Error("Error trying to write the image contents to the response", "error", err.Error())
-	}
-}
-
 // Get a thumbnail of a media with the ID specified in the URL parameter.
 func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	id, err := utils.IdFromParam(r)
@@ -131,6 +90,7 @@ func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
 
 func (e Env) Media(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
+		e.GetMedia(w, r)
 		return
 	}
 	if r.Method == "POST" {
@@ -139,6 +99,47 @@ func (e Env) Media(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Error(w, genericErrMsg, http.StatusBadRequest)
+}
+
+// Get a media with the ID specified in the URL parameter.
+func (e Env) GetMedia(w http.ResponseWriter, r *http.Request) {
+	id, err := utils.IdFromParam(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		e.Logger.Error("Error trying to parse ID from the request parameter", "error", err.Error())
+		return
+	}
+
+	img, err := utils.LoadImage(r.Context(), e.Database, id)
+
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			http.Error(w, "Media with this ID was not found.", http.StatusNotFound)
+			e.Logger.Error("Media with given ID was not found", "id", id)
+		} else {
+			http.Error(w, genericErrMsg, http.StatusInternalServerError)
+			e.Logger.Error("Error trying to load image", "error", err.Error())
+		}
+		return
+	}
+
+	var buf bytes.Buffer
+	err = jpeg.Encode(&buf, img, &jpeg.Options{Quality: 100})
+	if err != nil {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Error trying to encode the image", "error", err.Error())
+		return
+	}
+
+	w.Header().Set("Content-Type", "image/jpeg")
+	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
+
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write(buf.Bytes())
+	if err != nil {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Error trying to write the image contents to the response", "error", err.Error())
+	}
 }
 
 func (e Env) UploadMedia(w http.ResponseWriter, r *http.Request) {
