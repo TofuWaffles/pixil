@@ -4,7 +4,7 @@ import ThumbnailGroup from "./ThumbnailGroup";
 import { List, ListItem } from "@mui/material";
 
 export function Gallery() {
-  const [images, setImages] = React.useState<{ id: number; createdAt: Date; src: string }[]>([]);
+  const [thumbnails, setThumbnails] = React.useState<{ id: number; createdAt: Date; src: string }[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -34,7 +34,7 @@ export function Gallery() {
 
         // Wait for all image fetches to complete
         const thumbnails = await Promise.all(imagePromises);
-        setImages(thumbnails);
+        setThumbnails(thumbnails);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -45,12 +45,13 @@ export function Gallery() {
     fetchImages();
   }, []);
 
+  // TODO: Make a prettier loading and error screen
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   let thumbnailGroups: Map<number, Thumbnail[]> = new Map();
 
-  images.forEach((image) => {
+  thumbnails.forEach((image) => {
     let date = image.createdAt
     date.setHours(0, 0, 0, 0)
     let unix_time = Math.floor(date.getTime() / 1000)
@@ -60,7 +61,9 @@ export function Gallery() {
     }
     thumbnailGroups.get(unix_time)!.push(image)
   })
-  console.log(thumbnailGroups);
+
+  let [imgViewOpen, setImgViewOpen] = React.useState(false)
+  let [imgViewID, setImgViewID] = React.useState(-1)
 
   let thumbnailGroupComponents: ReactElement[] = [];
   new Map([...thumbnailGroups].sort((a, b) => { return b[0] - a[0] })).forEach((images, key) => {
@@ -71,7 +74,11 @@ export function Gallery() {
           year: "numeric",
           month: "long",
           day: "numeric",
-        })} thumbnails={images} />
+        })}
+          thumbnails={images}
+          setImgViewOpen={setImgViewOpen}
+          setImgViewID={setImgViewID}
+        />
       </ListItem>
     )
   })

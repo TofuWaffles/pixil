@@ -1,12 +1,18 @@
 import { Grid2 } from "@mui/material";
 import { Thumbnail } from "../types/props";
 import ThumbnailBox from "./ThumbnailBox";
+import { SetStateAction } from "react";
 
-export default function ThumbnailGroup({ title, thumbnails }: { title: string, thumbnails: Thumbnail[] }) {
+export default function ThumbnailGroup({ title, thumbnails, setImgViewOpen, setImgViewID }: {
+  title: string,
+  thumbnails: Thumbnail[],
+  setImgViewOpen: React.Dispatch<SetStateAction<boolean>>,
+  setImgViewID: React.Dispatch<SetStateAction<number>>
+}) {
   let tboxes = thumbnails.map((value, key) => {
     return (
       <Grid2 key={key} className="size-fit">
-        <ThumbnailBox thumbnail={value} />
+        <ThumbnailBox thumbnail={value} setImgViewOpen={setImgViewOpen} setImgViewID={setImgViewID} />
       </Grid2>
     )
   })
