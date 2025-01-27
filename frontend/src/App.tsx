@@ -12,9 +12,9 @@ export default function App() {
         contrastText: "#000000"
       },
       secondary: {
-        main: "#b2cf33",
-        light: "#c6e558",
-        dark: "#93a121",
+        main: "#5e99dd",
+        light: "#81b7e7",
+        dark: "#4d7abd",
         contrastText: "#000000",
       },
       background: {

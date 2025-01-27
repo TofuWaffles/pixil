@@ -29,7 +29,7 @@ func main() {
 	mux.HandleFunc("/", env.Chain(env.BasicChain(handlers.Home), env.GetOnly()))
 	mux.HandleFunc("/all-active-media", env.Chain(env.BasicChain(env.AllActiveMedia), env.GetOnly()))
 	mux.HandleFunc("/thumbnail", env.Chain(env.BasicChain(env.Thumbnail), env.GetOnly()))
-	mux.HandleFunc("/upload-test", env.Chain(env.BasicChain(env.UploadTest), env.PostOnly()))
+	mux.HandleFunc("/media", env.Chain(env.BasicChain(env.UploadTest), env.PostOnly()))
 	mux.HandleFunc("/download-test", env.Chain(env.BasicChain(env.DownloadTest), env.GetOnly()))
 
 	log.Println("Starting server on :4000")

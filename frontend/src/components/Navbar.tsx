@@ -17,7 +17,9 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import HomeIcon from '@mui/icons-material/Home';
+import UploadButton from './UploadButton';
 
+// TODO: Adjust width to fit smaller devices
 const drawerWidth = 240;
 
 const openedMixin = (theme: Theme): CSSObject => ({
@@ -193,6 +195,9 @@ export default function MainDrawer() {
           <Typography variant="h5" noWrap component="div">
             Pixil
           </Typography>
+          <div className='absolute right-5'>
+            <UploadButton></UploadButton>
+          </div>
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>
