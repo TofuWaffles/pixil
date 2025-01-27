@@ -1,6 +1,6 @@
 import { Grid2 } from "@mui/material";
 import { Thumbnail } from "../types/props";
-import ThumbnailBox from "./Thumbnail";
+import ThumbnailBox from "./ThumbnailBox";
 
 export default function ThumbnailGroup({ title, thumbnails }: { title: string, thumbnails: Thumbnail[] }) {
   let tboxes = thumbnails.map((value, key) => {

@@ -1,10 +1,10 @@
 import { Backdrop, Typography } from "@mui/material";
 
-export default function ImageView({ open, imgSrc }: { open: boolean, imgSrc: string }) {
+export default function ImageView({ open, mediaID }: { open: boolean, mediaID: number }) {
   return (
     <Backdrop open={open}>
       <Typography>
-        {imgSrc}
+        {mediaID}
       </Typography>
     </Backdrop>
   )
