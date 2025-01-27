@@ -90,6 +90,10 @@ func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
 
 func (e Env) Media(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
+		if r.URL.Query().Get("id") == "" {
+			e.AllActiveMedia(w, r)
+			return
+		}
 		e.GetMedia(w, r)
 		return
 	}
