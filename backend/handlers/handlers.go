@@ -4,13 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"image"
 	"image/jpeg"
-	"image/png"
 	"io"
-	"log"
 	"log/slog"
-	"mime"
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
@@ -32,7 +28,6 @@ type Env struct {
 }
 
 const genericErrMsg = "Something went wrong when trying serve the request"
-const mediaDir = "/pixil-media/"
 
 func Home(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello from Seallove!"))
@@ -53,58 +48,43 @@ func (e Env) AllActiveMedia(w http.ResponseWriter, r *http.Request) {
 }
 
 // Get a media with the ID specified in the URL parameter.
-func (e Env) Media(w http.ResponseWriter, r *http.Request) {
+func (e Env) GetMedia(w http.ResponseWriter, r *http.Request) {
 	id, err := utils.IdFromParam(r)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		e.Logger.Error("Error trying to parse ID form parameter", "error", err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		e.Logger.Error("Error trying to parse ID from the request parameter", "error", err.Error())
 		return
 	}
 
-	media, err := models.GetMedia(r.Context(), e.Database, id)
+	img, err := utils.LoadImage(r.Context(), e.Database, id)
+
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			http.Error(w, "Media with this ID was not found.", http.StatusNotFound)
+			e.Logger.Error("Media with given ID was not found", "id", id)
 		} else {
 			http.Error(w, genericErrMsg, http.StatusInternalServerError)
-			e.Logger.Error("Error trying to get media information from the database", "error", err.Error())
+			e.Logger.Error("Error trying to load image", "error", err.Error())
 		}
 		return
 	}
 
-	mediaFp := filepath.Join(mediaDir, media.FileName)
-
-	file, err := os.Open(mediaFp)
+	var buf bytes.Buffer
+	err = jpeg.Encode(&buf, img, &jpeg.Options{Quality: 100})
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
-		e.Logger.Error("Error trying to open media file", "error", err.Error())
-		return
-	}
-	defer file.Close()
-
-	mimeType := mime.TypeByExtension(filepath.Ext(media.FileName))
-	if mimeType == "" {
-		mimeType = "application/octet-stream"
-	}
-
-	fileBytes, err := io.ReadAll(file)
-	if err != nil {
-		http.Error(w, genericErrMsg, http.StatusInternalServerError)
-		e.Logger.Error("Error trying to read the file into bytes", "error", err.Error())
+		e.Logger.Error("Error trying to encode the image", "error", err.Error())
 		return
 	}
 
-	file.Close()
-
-	w.Header().Set("Content-Type", mimeType)
-	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(fileBytes)))
+	w.Header().Set("Content-Type", "image/jpeg")
+	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
 
 	w.WriteHeader(http.StatusOK)
-	_, err = w.Write(fileBytes)
+	_, err = w.Write(buf.Bytes())
 	if err != nil {
-		log.Printf("error writing response: %v", err)
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
-		e.Logger.Error("Error trying to send file bytes in response", "error", err.Error())
+		e.Logger.Error("Error trying to write the image contents to the response", "error", err.Error())
 	}
 }
 
@@ -117,7 +97,8 @@ func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	media, err := models.GetMedia(r.Context(), e.Database, id)
+	img, err := utils.LoadImage(r.Context(), e.Database, id)
+
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			http.Error(w, "Media with this ID was not found.", http.StatusNotFound)
@@ -126,31 +107,6 @@ func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, genericErrMsg, http.StatusInternalServerError)
 			e.Logger.Error("Error trying to get media information from the database", "error", err.Error())
 		}
-		return
-	}
-
-	mediaFp := filepath.Join(mediaDir, media.FileName)
-	file, err := os.Open(mediaFp)
-	if err != nil {
-		http.Error(w, genericErrMsg, http.StatusInternalServerError)
-		e.Logger.Error("Error trying to open file", "error", err.Error())
-		return
-	}
-	defer file.Close()
-
-	var img image.Image
-	switch filepath.Ext(media.FileName) {
-	case ".png":
-		img, err = png.Decode(file)
-	case ".jpg", ".jpeg":
-		img, err = jpeg.Decode(file)
-	default:
-		http.Error(w, "unsupported image format", http.StatusUnsupportedMediaType)
-		return
-	}
-	if err != nil {
-		http.Error(w, genericErrMsg, http.StatusInternalServerError)
-		e.Logger.Error("Error trying to decode the file", "error", err.Error())
 		return
 	}
 
@@ -173,7 +129,19 @@ func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (e Env) UploadTest(w http.ResponseWriter, r *http.Request) {
+func (e Env) Media(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		return
+	}
+	if r.Method == "POST" {
+		e.UploadMedia(w, r)
+		return
+	}
+
+	http.Error(w, genericErrMsg, http.StatusBadRequest)
+}
+
+func (e Env) UploadMedia(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(32 << 20)
 
 	file, header, err := r.FormFile("file")
