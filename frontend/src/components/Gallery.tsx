@@ -1,12 +1,15 @@
 import React, { ReactElement } from "react";
 import { Thumbnail } from "../types/props";
 import ThumbnailGroup from "./ThumbnailGroup";
-import { List, ListItem } from "@mui/material";
+import { Backdrop, List, ListItem } from "@mui/material";
+import ImageView from "./ImageView";
 
 export function Gallery() {
   const [thumbnails, setThumbnails] = React.useState<{ id: number; createdAt: Date; src: string }[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [imgViewOpen, setImgViewOpen] = React.useState(false)
+  const [imgViewID, setImgViewID] = React.useState(-1)
 
   React.useEffect(() => {
     const fetchImages = async () => {
@@ -62,9 +65,6 @@ export function Gallery() {
     thumbnailGroups.get(unix_time)!.push(image)
   })
 
-  let [imgViewOpen, setImgViewOpen] = React.useState(false)
-  let [imgViewID, setImgViewID] = React.useState(-1)
-
   let thumbnailGroupComponents: ReactElement[] = [];
   new Map([...thumbnailGroups].sort((a, b) => { return b[0] - a[0] })).forEach((images, key) => {
     thumbnailGroupComponents.push(
@@ -82,6 +82,11 @@ export function Gallery() {
       </ListItem>
     )
   })
+  if (imgViewOpen) return (
+    <Backdrop open={true}>
+      <ImageView mediaID={imgViewID}></ImageView>
+    </Backdrop>
+  )
   return (
     <div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
