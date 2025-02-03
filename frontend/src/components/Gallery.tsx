@@ -1,15 +1,13 @@
 import React, { ReactElement } from "react";
 import { Thumbnail } from "../types/props";
 import ThumbnailGroup from "./ThumbnailGroup";
-import { Backdrop, List, ListItem } from "@mui/material";
-import ImageView from "./ImageView";
+import { List, ListItem } from "@mui/material";
 
 export function Gallery() {
   const [thumbnails, setThumbnails] = React.useState<{ id: number; createdAt: Date; src: string }[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
-  const [imgViewOpen, setImgViewOpen] = React.useState(false)
-  const [imgViewID, setImgViewID] = React.useState(-1)
+  const [imgView, setImgView] = React.useState<React.ReactNode | null>(null)
 
   React.useEffect(() => {
     const fetchImages = async () => {
@@ -76,23 +74,18 @@ export function Gallery() {
           day: "numeric",
         })}
           thumbnails={images}
-          setImgViewOpen={setImgViewOpen}
-          setImgViewID={setImgViewID}
+          setImgView={setImgView}
         />
       </ListItem>
     )
   })
-  if (imgViewOpen) return (
-    <Backdrop open={true}>
-      <ImageView mediaID={imgViewID}></ImageView>
-    </Backdrop>
-  )
   return (
     <div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
         <List sx={{ width: "100%" }}>
           {thumbnailGroupComponents}
         </List>
+        {imgView}
       </div>
     </div>
   );
