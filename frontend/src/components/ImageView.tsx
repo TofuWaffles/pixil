@@ -1,13 +1,14 @@
-import { Backdrop, Box } from "@mui/material";
+import { Dialog, Box } from "@mui/material";
+import { ReactNode, SetStateAction } from "react";
 
-export default function ImageView({ mediaID }: { mediaID: number }) {
+export default function ImageView({ mediaID, setImgView }: { mediaID: number, setImgView: React.Dispatch<SetStateAction<ReactNode | null>> }) {
   return (
-    <Backdrop open={true}>
+    <Dialog open={true} onClick={() => setImgView(null)}>
       <Box sx={{
         bgcolor: 'black'
       }}>
         {mediaID}
       </Box>
-    </Backdrop>
+    </Dialog>
   )
 }

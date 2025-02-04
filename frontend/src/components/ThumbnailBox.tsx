@@ -10,7 +10,7 @@ export default function ThumbnailBox({ thumbnail, setImgView }: {
   return (
     <Box
       onClick={() => {
-        setImgView(ImageView({ mediaID: thumbnail.id }))
+        setImgView(ImageView({ mediaID: thumbnail.id, setImgView: setImgView }))
       }}
       className="size-24 md:size-48 lg:size-64 border-2 border-french-gray-2"
       component="img"
