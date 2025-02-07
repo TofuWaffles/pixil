@@ -1,14 +1,39 @@
-import { Dialog, Box } from "@mui/material";
-import { ReactNode, SetStateAction } from "react";
+import { Box } from "@mui/material";
+import React from "react";
+import { useSearchParams } from "react-router-dom";
 
-export default function ImageView({ mediaID, setImgView }: { mediaID: number, setImgView: React.Dispatch<SetStateAction<ReactNode | null>> }) {
+// TODO: Make this its own page on the router
+export default function ImageView() {
+  const [idParam, _] = useSearchParams();
+  const [imgUrl, setImgUrl] = React.useState("");
+
+  React.useEffect(() => {
+    const mediaID = idParam.get("id")
+    const fetchImage = async () => {
+      try {
+        const imageResponse = await fetch(import.meta.env.VITE_BACKEND_URL + `/media?id=${mediaID}`);
+        if (!imageResponse.ok) {
+          throw new Error(`Error fetching image with ID ${mediaID}: ${imageResponse.statusText}`);
+        }
+
+        const imageBlob = await imageResponse.blob();
+        setImgUrl(URL.createObjectURL(imageBlob));
+      } catch (err: any) {
+        console.log(err);
+      }
+    }
+    fetchImage()
+  }, []);
+
   return (
-    <Dialog open={true} onClick={() => setImgView(null)}>
-      <Box sx={{
-        bgcolor: 'black'
-      }}>
-        {mediaID}
+    <div className="bg-background-dark">
+      <Box
+        className=""
+        component="img"
+        alt="User Image"
+        src={imgUrl}
+      >
       </Box>
-    </Dialog>
+    </div>
   )
 }

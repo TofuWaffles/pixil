@@ -1,16 +1,16 @@
 import { Box } from '@mui/material';
 import { Thumbnail } from '../types/props';
-import React, { SetStateAction } from 'react';
-import ImageView from './ImageView';
+import { useNavigate } from 'react-router-dom';
 
-export default function ThumbnailBox({ thumbnail, setImgView }: {
+export default function ThumbnailBox({ thumbnail }: {
   thumbnail: Thumbnail,
-  setImgView: React.Dispatch<SetStateAction<React.ReactNode | null>>,
 }) {
+  const navigate = useNavigate();
+
   return (
     <Box
       onClick={() => {
-        setImgView(ImageView({ mediaID: thumbnail.id, setImgView: setImgView }))
+        navigate("/image?id=" + thumbnail.id.toString())
       }}
       className="size-24 md:size-48 lg:size-64 border-2 border-french-gray-2"
       component="img"

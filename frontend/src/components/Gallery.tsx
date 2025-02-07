@@ -3,11 +3,11 @@ import { Thumbnail } from "../types/props";
 import ThumbnailGroup from "./ThumbnailGroup";
 import { List, ListItem } from "@mui/material";
 
+
 export function Gallery() {
   const [thumbnails, setThumbnails] = React.useState<{ id: number; createdAt: Date; src: string }[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
-  const [imgView, setImgView] = React.useState<React.ReactNode | null>(null)
 
   React.useEffect(() => {
     const fetchImages = async () => {
@@ -20,7 +20,6 @@ export function Gallery() {
         const imageList = await response.json();
         const media = imageList.map((item: { id: number, createdAt: string }) => { return { id: item.id, createdAt: new Date(item.createdAt) } });
         console.log(media);
-
 
         const imagePromises = media.map(async (m: Thumbnail) => {
           const imageResponse = await fetch(import.meta.env.VITE_BACKEND_URL + `/thumbnail?id=${m.id}`);
@@ -74,7 +73,6 @@ export function Gallery() {
           day: "numeric",
         })}
           thumbnails={images}
-          setImgView={setImgView}
         />
       </ListItem>
     )
@@ -85,7 +83,6 @@ export function Gallery() {
         <List sx={{ width: "100%" }}>
           {thumbnailGroupComponents}
         </List>
-        {imgView}
       </div>
     </div>
   );
