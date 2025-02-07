@@ -26,9 +26,8 @@ export default function ImageView() {
   }, []);
 
   return (
-    <div className="bg-background-dark">
+    <div className="bg-primary-contrast h-screen w-screen flex flex-row justify-center items-center">
       <Box
-        className=""
         component="img"
         alt="User Image"
         src={imgUrl}
