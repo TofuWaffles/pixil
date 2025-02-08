@@ -1,11 +1,13 @@
-import { Box } from "@mui/material";
+import { ArrowBack } from "@mui/icons-material";
+import { Box, IconButton } from "@mui/material";
 import React from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 // TODO: Make this its own page on the router
 export default function ImageView() {
   const [idParam, _] = useSearchParams();
   const [imgUrl, setImgUrl] = React.useState("");
+  const nagivate = useNavigate();
 
   React.useEffect(() => {
     const mediaID = idParam.get("id")
@@ -26,13 +28,20 @@ export default function ImageView() {
   }, []);
 
   return (
-    <div className="bg-primary-contrast h-screen w-screen flex flex-row justify-center items-center">
-      <Box
-        component="img"
-        alt="User Image"
-        src={imgUrl}
-      >
-      </Box>
+    <div className="bg-primary-contrast">
+      <IconButton aria-label="go back" sx={{ color: "white", width: 100, height: 100 }} onClick={() => {
+        nagivate(-1);
+      }}>
+        <ArrowBack sx={{ width: 40, height: 40 }} />
+      </IconButton>
+      <div className="h-screen w-screen flex flex-row justify-center items-center">
+        <Box
+          component="img"
+          alt="User Image"
+          src={imgUrl}
+        >
+        </Box>
+      </div>
     </div>
   )
 }
