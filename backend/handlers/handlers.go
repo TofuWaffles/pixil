@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/textproto"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -56,8 +57,8 @@ func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	img, err := utils.LoadImage(r.Context(), e.Database, id)
-
+	var buf bytes.Buffer
+	media, err := models.GetMedia(r.Context(), e.Database, id)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			http.Error(w, "Media with this ID was not found.", http.StatusNotFound)
@@ -68,19 +69,35 @@ func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	mediaFp := filepath.Clean(filepath.Join(utils.MediaDir, media.FileName))
 
-	var buf bytes.Buffer
-	err = jpeg.Encode(&buf, img, &jpeg.Options{Quality: 50})
-	if err != nil {
-		http.Error(w, genericErrMsg, http.StatusInternalServerError)
-		e.Logger.Error("Error trying to encode the thumbnail", "error", err.Error())
-		return
+	if filepath.Ext(media.FileName) == ".jpg" || filepath.Ext(media.FileName) == ".png" {
+		img, err := utils.LoadImage(mediaFp)
+
+		if err != nil {
+			http.Error(w, genericErrMsg, http.StatusInternalServerError)
+			e.Logger.Error("Error trying to generate thumbnail", "error", err.Error())
+		}
+
+		err = jpeg.Encode(&buf, img, &jpeg.Options{Quality: 50})
+		if err != nil {
+			http.Error(w, genericErrMsg, http.StatusInternalServerError)
+			e.Logger.Error("Error trying to encode the thumbnail", "error", err.Error())
+			return
+		}
+	} else if filepath.Ext(media.FileName) == ".mp4" {
+		cmd := exec.Command("ffmpeg", "-i", mediaFp, "-vframes", "1", "-qscale:v", "4", "-f", "image2", "-")
+		cmd.Stdout = &buf
+		err := cmd.Run()
+		if err != nil {
+			http.Error(w, genericErrMsg, http.StatusInternalServerError)
+			e.Logger.Error("Error trying to generate thumbnail from video", "error", err.Error())
+		}
 	}
 
 	w.Header().Set("Content-Type", "image/jpeg")
 	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
 
-	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(buf.Bytes())
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
@@ -114,7 +131,20 @@ func (e Env) GetMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	img, err := utils.LoadImage(r.Context(), e.Database, id)
+	media, err := models.GetMedia(r.Context(), e.Database, id)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			http.Error(w, "Media with this ID was not found.", http.StatusNotFound)
+			e.Logger.Error("Media with given ID was not found", "id", id)
+		} else {
+			http.Error(w, genericErrMsg, http.StatusInternalServerError)
+			e.Logger.Error("Error trying to get media information from the database", "error", err.Error())
+		}
+		return
+	}
+	mediaFp := filepath.Clean(filepath.Join(utils.MediaDir, media.FileName))
+
+	img, err := utils.LoadImage(mediaFp)
 
 	if err != nil {
 		if err == pgx.ErrNoRows {
