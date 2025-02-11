@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/TofuWaffles/pixil/database"
 	"github.com/TofuWaffles/pixil/utils"
@@ -144,36 +145,45 @@ func (e Env) GetMedia(w http.ResponseWriter, r *http.Request) {
 	}
 	mediaFp := filepath.Clean(filepath.Join(utils.MediaDir, media.FileName))
 
-	img, err := utils.LoadImage(mediaFp)
+	if filepath.Ext(media.FileName) == ".jpg" || filepath.Ext(media.FileName) == ".png" {
+		img, err := utils.LoadImage(mediaFp)
+		var buf bytes.Buffer
 
-	if err != nil {
-		if err == pgx.ErrNoRows {
-			http.Error(w, "Media with this ID was not found.", http.StatusNotFound)
-			e.Logger.Error("Media with given ID was not found", "id", id)
-		} else {
-			http.Error(w, genericErrMsg, http.StatusInternalServerError)
-			e.Logger.Error("Error trying to load image", "error", err.Error())
+		if err != nil {
+			if err == pgx.ErrNoRows {
+				http.Error(w, "Media with this ID was not found.", http.StatusNotFound)
+				e.Logger.Error("Media with given ID was not found", "id", id)
+			} else {
+				http.Error(w, genericErrMsg, http.StatusInternalServerError)
+				e.Logger.Error("Error trying to load image", "error", err.Error())
+			}
+			return
 		}
-		return
+
+		err = jpeg.Encode(&buf, img, &jpeg.Options{Quality: 100})
+		if err != nil {
+			http.Error(w, genericErrMsg, http.StatusInternalServerError)
+			e.Logger.Error("Error trying to encode the image", "error", err.Error())
+			return
+		}
+		w.Header().Set("Content-Type", "image/jpeg")
+		w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
+
+		w.WriteHeader(http.StatusOK)
+		_, err = w.Write(buf.Bytes())
+		if err != nil {
+			http.Error(w, genericErrMsg, http.StatusInternalServerError)
+			e.Logger.Error("Error trying to write the image contents to the response", "error", err.Error())
+		}
+	} else if filepath.Ext(media.FileName) == ".mp4" {
+		vidFile, err := os.Open(mediaFp)
+		if err != nil {
+			http.Error(w, genericErrMsg, http.StatusInternalServerError)
+			e.Logger.Error("Unable to open video file", "file", media.FileName, "error", err)
+		}
+		http.ServeContent(w, r, media.FileName, time.Time{}, vidFile)
 	}
 
-	var buf bytes.Buffer
-	err = jpeg.Encode(&buf, img, &jpeg.Options{Quality: 100})
-	if err != nil {
-		http.Error(w, genericErrMsg, http.StatusInternalServerError)
-		e.Logger.Error("Error trying to encode the image", "error", err.Error())
-		return
-	}
-
-	w.Header().Set("Content-Type", "image/jpeg")
-	w.Header().Set("Content-Length", strconv.Itoa(buf.Len()))
-
-	w.WriteHeader(http.StatusOK)
-	_, err = w.Write(buf.Bytes())
-	if err != nil {
-		http.Error(w, genericErrMsg, http.StatusInternalServerError)
-		e.Logger.Error("Error trying to write the image contents to the response", "error", err.Error())
-	}
 }
 
 func (e Env) UploadMedia(w http.ResponseWriter, r *http.Request) {

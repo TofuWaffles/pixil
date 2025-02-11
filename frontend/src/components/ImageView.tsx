@@ -1,6 +1,7 @@
 import { ArrowBack } from "@mui/icons-material";
 import { Box, IconButton } from "@mui/material";
 import React from "react";
+import ReactPlayer from "react-player";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 // TODO: Make this its own page on the router
@@ -8,6 +9,7 @@ export default function ImageView() {
   const [idParam, _] = useSearchParams();
   const [imgUrl, setImgUrl] = React.useState("");
   const nagivate = useNavigate();
+  const [isVideo, setIsVideo] = React.useState(false);
 
   React.useEffect(() => {
     const mediaID = idParam.get("id")
@@ -17,7 +19,9 @@ export default function ImageView() {
         if (!imageResponse.ok) {
           throw new Error(`Error fetching image with ID ${mediaID}: ${imageResponse.statusText}`);
         }
-
+        if (imageResponse.headers.get("content-type")?.startsWith("video")) {
+          setIsVideo(true);
+        }
         const imageBlob = await imageResponse.blob();
         setImgUrl(URL.createObjectURL(imageBlob));
       } catch (err: any) {
@@ -27,21 +31,36 @@ export default function ImageView() {
     fetchImage()
   }, []);
 
-  return (
-    <div className="bg-primary-contrast">
-      <IconButton aria-label="go back" sx={{ color: "white", width: 100, height: 100 }} onClick={() => {
-        nagivate(-1);
-      }}>
-        <ArrowBack sx={{ width: 40, height: 40 }} />
-      </IconButton>
-      <div className="h-screen w-screen flex flex-row justify-center items-center">
-        <Box
-          component="img"
-          alt="User Image"
-          src={imgUrl}
-        >
-        </Box>
+  if (isVideo) {
+    return (
+      <div className="bg-primary-contrast">
+        <IconButton aria-label="go back" sx={{ color: "white", width: 100, height: 100 }} onClick={() => {
+          nagivate(-1);
+        }}>
+          <ArrowBack sx={{ width: 40, height: 40 }} />
+        </IconButton>
+        <div className="h-screen w-screen flex flex-row justify-center items-center">
+          <ReactPlayer url={imgUrl} />
+        </div>
       </div>
-    </div>
-  )
+    )
+  } else {
+    return (
+      <div className="bg-primary-contrast">
+        <IconButton aria-label="go back" sx={{ color: "white", width: 100, height: 100 }} onClick={() => {
+          nagivate(-1);
+        }}>
+          <ArrowBack sx={{ width: 40, height: 40 }} />
+        </IconButton>
+        <div className="h-screen w-screen flex flex-row justify-center items-center">
+          <Box
+            component="img"
+            alt="User Image"
+            src={imgUrl}
+          >
+          </Box>
+        </div>
+      </div>
+    )
+  }
 }
