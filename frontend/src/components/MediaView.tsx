@@ -30,36 +30,27 @@ export default function MediaView() {
     fetchImage()
   }, []);
 
-  if (isVideo) {
-    return (
-      <div className="bg-primary-contrast flex">
-        <IconButton aria-label="go back" sx={{ color: "white", width: 100, height: 100 }} onClick={() => {
-          nagivate(-1);
-        }}>
-          <ArrowBack sx={{ width: 40, height: 40 }} />
-        </IconButton>
-        <div className="h-screen w-screen flex flex-row justify-center items-center">
-          <ReactPlayer url={mediaUrl} controls={true} playing={true} />
-        </div>
-      </div>
-    )
-  } else {
-    return (
-      <div className="bg-primary-contrast flex">
-        <IconButton aria-label="go back" sx={{ color: "white", width: 100, height: 100, position: "relative" }} onClick={() => {
-          nagivate(-1);
-        }}>
-          <ArrowBack sx={{ width: 40, height: 40 }} />
-        </IconButton>
-        <div className="h-screen w-screen flex flex-row justify-center items-center">
-          <Box
-            component="img"
-            alt="User Image"
-            src={mediaUrl}
-          >
-          </Box>
-        </div>
-      </div>
-    )
-  }
+  return (
+    <div className="bg-primary-contrast flex">
+      <IconButton aria-label="go back" sx={{ color: "white", width: 100, height: 100 }} onClick={() => {
+        nagivate(-1);
+      }}>
+        <ArrowBack sx={{ width: 40, height: 40 }} />
+      </IconButton>
+      {
+        (isVideo)
+          ? <div className="h-screen w-screen flex flex-row justify-center items-center">
+            <ReactPlayer url={mediaUrl} controls={true} playing={true} />
+          </div>
+          : <div className="h-screen w-screen flex flex-row justify-center items-center">
+            <Box
+              component="img"
+              alt="User Image"
+              src={mediaUrl}
+            >
+            </Box>
+          </div>
+      }
+    </div>
+  )
 }
