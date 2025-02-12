@@ -40,7 +40,7 @@ export default function ImageView() {
           <ArrowBack sx={{ width: 40, height: 40 }} />
         </IconButton>
         <div className="h-screen w-screen flex flex-row justify-center items-center">
-          <ReactPlayer url={imgUrl} />
+          <ReactPlayer url={imgUrl} controls={true} playing={true} />
         </div>
       </div>
     )
