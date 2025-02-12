@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import MainLayout from "./components/Layout";
 import Settings from "./pages/Settings";
 import { Home } from "./pages/Home";
-import MediaView from "./components/ImageView";
+import MediaView from "./components/MediaView";
 
 export default function AppRoutes() {
   return (

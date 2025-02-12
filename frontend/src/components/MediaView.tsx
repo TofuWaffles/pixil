@@ -32,7 +32,7 @@ export default function MediaView() {
 
   if (isVideo) {
     return (
-      <div className="bg-primary-contrast">
+      <div className="bg-primary-contrast flex">
         <IconButton aria-label="go back" sx={{ color: "white", width: 100, height: 100 }} onClick={() => {
           nagivate(-1);
         }}>
@@ -45,8 +45,8 @@ export default function MediaView() {
     )
   } else {
     return (
-      <div className="bg-primary-contrast">
-        <IconButton aria-label="go back" sx={{ color: "white", width: 100, height: 100 }} onClick={() => {
+      <div className="bg-primary-contrast flex">
+        <IconButton aria-label="go back" sx={{ color: "white", width: 100, height: 100, position: "relative" }} onClick={() => {
           nagivate(-1);
         }}>
           <ArrowBack sx={{ width: 40, height: 40 }} />
