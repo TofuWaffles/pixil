@@ -4,12 +4,11 @@ import React from "react";
 import ReactPlayer from "react-player";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-// TODO: Make this its own page on the router
-export default function ImageView() {
+export default function MediaView() {
   const [idParam, _] = useSearchParams();
-  const [imgUrl, setImgUrl] = React.useState("");
-  const nagivate = useNavigate();
+  const [mediaUrl, setMediaUrl] = React.useState("");
   const [isVideo, setIsVideo] = React.useState(false);
+  const nagivate = useNavigate();
 
   React.useEffect(() => {
     const mediaID = idParam.get("id")
@@ -23,7 +22,7 @@ export default function ImageView() {
           setIsVideo(true);
         }
         const imageBlob = await imageResponse.blob();
-        setImgUrl(URL.createObjectURL(imageBlob));
+        setMediaUrl(URL.createObjectURL(imageBlob));
       } catch (err: any) {
         console.log(err);
       }
@@ -40,7 +39,7 @@ export default function ImageView() {
           <ArrowBack sx={{ width: 40, height: 40 }} />
         </IconButton>
         <div className="h-screen w-screen flex flex-row justify-center items-center">
-          <ReactPlayer url={imgUrl} controls={true} playing={true} />
+          <ReactPlayer url={mediaUrl} controls={true} playing={true} />
         </div>
       </div>
     )
@@ -56,7 +55,7 @@ export default function ImageView() {
           <Box
             component="img"
             alt="User Image"
-            src={imgUrl}
+            src={mediaUrl}
           >
           </Box>
         </div>

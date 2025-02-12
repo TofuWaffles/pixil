@@ -10,7 +10,7 @@ export default function ThumbnailBox({ thumbnail }: {
   return (
     <Box
       onClick={() => {
-        navigate("/image?id=" + thumbnail.id.toString())
+        navigate("/media?id=" + thumbnail.id.toString())
       }}
       className="size-24 md:size-48 lg:size-64 border-2 border-french-gray-2"
       component="img"
