@@ -16,7 +16,7 @@ type LoginUser struct {
 	password string
 }
 
-func (e Env) Register(w http.ResponseWriter, r *http.Request) {
+func (e Env) Login(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var loginUser LoginUser
 	err := decoder.Decode(&loginUser)
