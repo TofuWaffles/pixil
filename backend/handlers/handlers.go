@@ -183,7 +183,6 @@ func (e Env) GetMedia(w http.ResponseWriter, r *http.Request) {
 		}
 		http.ServeContent(w, r, media.FileName, time.Time{}, vidFile)
 	}
-
 }
 
 func (e Env) UploadMedia(w http.ResponseWriter, r *http.Request) {
