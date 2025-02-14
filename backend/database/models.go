@@ -8,11 +8,17 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+const (
+	Member = iota
+	Admin  = iota
+)
+
 // A user within the system.
 type User struct {
 	Email        string `json:"email"`
 	Username     string `json:"username"`
 	PasswordHash string `json:"passwordHash"`
+	UserType     int    `json:"userType"`
 }
 
 // Represents media status.
@@ -41,7 +47,7 @@ type Tag struct {
 // Retrieves a user from the database associated with a given email.
 func GetUser(ctx context.Context, db *pgxpool.Pool, email string) (User, error) {
 	rows, _ := db.Query(ctx,
-		`SELECT email, username, password_hash
+		`SELECT email, username, password_hash, user_type
 		FROM user
 		WHERE email = $1`,
 		email,
@@ -53,11 +59,12 @@ func GetUser(ctx context.Context, db *pgxpool.Pool, email string) (User, error) 
 // Inserts a user to the database.
 func AddUser(ctx context.Context, db *pgxpool.Pool, user User) error {
 	_, err := db.Exec(ctx,
-		`INSERT INTO user (email, username, password_hash)
+		`INSERT INTO user (email, username, password_hash, user_type)
 		VALUES ($1, $2, $3, $4)`,
 		user.Email,
 		user.Username,
 		user.PasswordHash,
+		user.UserType,
 	)
 	return err
 }

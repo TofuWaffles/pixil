@@ -1,7 +1,8 @@
 CREATE TABLE IF NOT EXISTS "user" (
   email VARCHAR(255) PRIMARY KEY,
   username VARCHAR(255) NOT NULL,
-  password_hash VARCHAR(255) NOT NULL
+  password_hash VARCHAR(255) NOT NULL,
+  user_type INT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS media (
