@@ -1,6 +1,6 @@
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { Box } from "@mui/material";
+import { Box, FormHelperText } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
 import Grid2 from "@mui/material/Grid2";
 import IconButton from "@mui/material/IconButton";
@@ -9,10 +9,13 @@ import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import useTheme from "@mui/material/styles/useTheme";
 import React from "react";
+import validateEmail from "../utils/ValidateEmail";
 
 export default function Login() {
   const theme = useTheme();
   const [showPassword, setShowPassword] = React.useState(false);
+  const [emailValid, setEmailValid] = React.useState(true);
+  const [passwordValid, setPasswordValid] = React.useState(true);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   return (
@@ -44,7 +47,18 @@ export default function Login() {
             label="Email Address"
             autoFocus={true}
             fullWidth={true}
+            error={!emailValid}
+            onBlur={(event) => {
+              if (!validateEmail(event.target.value)) {
+                setEmailValid(false)
+              }
+            }}
           />
+          {!emailValid && (
+            <FormHelperText error id="email-error">
+              Please enter a valid email address.
+            </FormHelperText>
+          )}
         </FormControl>
         <FormControl sx={{ m: 2, width: "80%", backgroundColor: theme.palette.primary.light }} variant="outlined">
           <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
@@ -68,7 +82,18 @@ export default function Login() {
             }
             label="Password"
             fullWidth={true}
+            error={!passwordValid}
+            onBlur={(event) => {
+              if (event.target.value.length == 0) {
+                setPasswordValid(false)
+              }
+            }}
           />
+          {!passwordValid && (
+            <FormHelperText error id="password-error">
+              Password field cannot be empty.
+            </FormHelperText>
+          )}
         </FormControl>
       </Grid2>
     </Box>
