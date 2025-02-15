@@ -1,5 +1,6 @@
-import { ArrowBack } from "@mui/icons-material";
-import { Box, IconButton } from "@mui/material";
+import ArrowBack from "@mui/icons-material/ArrowBack";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
 import React from "react";
 import ReactPlayer from "react-player";
 import { useNavigate, useSearchParams } from "react-router-dom";

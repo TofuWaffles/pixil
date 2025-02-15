@@ -1,7 +1,8 @@
 import React, { ReactElement } from "react";
 import { Thumbnail } from "../types/props";
 import ThumbnailGroup from "./ThumbnailGroup";
-import { List, ListItem } from "@mui/material";
+import ListItem from "@mui/material/ListItem";
+import List from "@mui/material/List";
 
 
 export function Gallery() {

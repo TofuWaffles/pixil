@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import Box from '@mui/material/Box';
 import { Thumbnail } from '../types/props';
 import { useNavigate } from 'react-router-dom';
 

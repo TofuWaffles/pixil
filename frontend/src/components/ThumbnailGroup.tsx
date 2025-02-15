@@ -1,4 +1,4 @@
-import { Grid2 } from "@mui/material";
+import Grid2 from "@mui/material/Grid2";
 import { Thumbnail } from "../types/props";
 import ThumbnailBox from "./ThumbnailBox";
 
