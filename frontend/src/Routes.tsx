@@ -3,6 +3,7 @@ import MainLayout from "./components/Layout";
 import Settings from "./pages/Settings";
 import { Home } from "./pages/Home";
 import MediaView from "./pages/MediaView";
+import Login from "./pages/Login";
 
 export default function AppRoutes() {
   return (
@@ -13,6 +14,7 @@ export default function AppRoutes() {
         </Route>
         <Route path="/media" element={<MediaView />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </BrowserRouter>
   );
