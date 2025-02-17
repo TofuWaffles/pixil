@@ -49,7 +49,9 @@ export default function Login() {
             fullWidth={true}
             error={!emailValid}
             onBlur={(event) => {
-              if (!validateEmail(event.target.value)) {
+              if (validateEmail(event.target.value)) {
+                setEmailValid(true)
+              } else {
                 setEmailValid(false)
               }
             }}
@@ -86,6 +88,8 @@ export default function Login() {
             onBlur={(event) => {
               if (event.target.value.length == 0) {
                 setPasswordValid(false)
+              } else {
+                setPasswordValid(true)
               }
             }}
           />
