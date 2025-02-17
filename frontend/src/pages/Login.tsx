@@ -124,7 +124,13 @@ export default function Login() {
           color: theme.palette.secondary.contrastText
         }}
           endIcon={<LoginIcon />}
-          onClick={() => { loginOnClick(email, password, setLoginError) }}
+          onClick={() => {
+            if (!emailValid || !passwordValid) {
+              setLoginError("Please correct the email or password fields before logging in");
+              return;
+            }
+            loginOnClick(email, password, setLoginError);
+          }}
         >
           <Typography textTransform={'capitalize'}>Login</Typography>
         </Button>
