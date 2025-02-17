@@ -30,6 +30,7 @@ func main() {
 	mux.HandleFunc("/thumbnail", env.Chain(env.BasicChain(env.Thumbnail), env.GetOnly()))
 	mux.HandleFunc("/media", env.Chain(env.BasicChain(env.Media)))
 	mux.HandleFunc("/download-test", env.Chain(env.BasicChain(env.DownloadTest), env.GetOnly()))
+	mux.HandleFunc("/login", env.Chain(env.BasicChain(env.Login)))
 
 	log.Println("Starting server on :4000")
 

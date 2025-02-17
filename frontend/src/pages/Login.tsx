@@ -1,6 +1,6 @@
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { Box, Button, FormHelperText, Typography } from "@mui/material";
+import { Alert, Box, Button, FormHelperText, Typography } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
 import Grid2 from "@mui/material/Grid2";
 import IconButton from "@mui/material/IconButton";
@@ -8,7 +8,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import useTheme from "@mui/material/styles/useTheme";
-import React from "react";
+import React, { SetStateAction } from "react";
 import validateEmail from "../utils/ValidateEmail";
 import LoginIcon from '@mui/icons-material/Login';
 
@@ -19,6 +19,7 @@ export default function Login() {
   const [password, setPassword] = React.useState("");
   const [emailValid, setEmailValid] = React.useState(true);
   const [passwordValid, setPasswordValid] = React.useState(true);
+  const [loginError, setLoginError] = React.useState("");
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   return (
@@ -43,6 +44,9 @@ export default function Login() {
           minHeight: '100vh',
         }}
       >
+        {
+          (loginError.length > 0) && <Alert severity="error" variant="filled" sx={{ m: 5 }}>{loginError}</Alert>
+        }
         <FormControl sx={{ m: 2, width: "80%", backgroundColor: theme.palette.primary.light }} variant="outlined">
           <InputLabel htmlFor="outlined-adornment-email">Email Address</InputLabel>
           <OutlinedInput
@@ -120,10 +124,49 @@ export default function Login() {
           color: theme.palette.secondary.contrastText
         }}
           endIcon={<LoginIcon />}
+          onClick={() => { loginOnClick(email, password, setLoginError) }}
         >
           <Typography textTransform={'capitalize'}>Login</Typography>
         </Button>
       </Grid2>
     </Box>
   )
+}
+
+const loginOnClick = (email: string, password: string, setLoginError: React.Dispatch<SetStateAction<string>>) => {
+  const fetchToken = async () => {
+    try {
+      const response = await fetch(import.meta.env.VITE_BACKEND_URL + "/login", {
+        method: "POST",
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+        }
+      });
+      if (!response.ok) {
+        throw response.status
+      }
+
+      const jsonResponse: { token: string } = await response.json()
+
+      console.log(jsonResponse.token);
+    } catch (errStatus: any) {
+      switch (errStatus) {
+        case 401:
+          setLoginError("Incorrect password entered. Please try again.");
+          break;
+        case 404:
+          setLoginError("A user with the given email address was not found.");
+          break;
+        default:
+          setLoginError("An unexpected error occured. Please let the administrator know if the issue persists.");
+          break;
+      }
+    }
+  }
+
+  fetchToken();
 }

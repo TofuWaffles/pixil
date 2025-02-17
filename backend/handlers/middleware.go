@@ -98,8 +98,8 @@ func (e Env) PostOnly() Middleware {
 	return func(f http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			if r.Method != "" && r.Method != "POST" {
-				http.Error(w, "Only GET requests are allowed for this path.", http.StatusBadRequest)
-				e.Logger.Error("Non-GET method used on request", "method", r.Method)
+				http.Error(w, "Only POST requests are allowed for this path.", http.StatusBadRequest)
+				e.Logger.Error("Non-POST method used on request", "method", r.Method)
 				return
 			}
 
