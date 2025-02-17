@@ -1,6 +1,6 @@
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { Box, FormHelperText } from "@mui/material";
+import { Box, Button, FormHelperText, Typography } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
 import Grid2 from "@mui/material/Grid2";
 import IconButton from "@mui/material/IconButton";
@@ -10,10 +10,13 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import useTheme from "@mui/material/styles/useTheme";
 import React from "react";
 import validateEmail from "../utils/ValidateEmail";
+import LoginIcon from '@mui/icons-material/Login';
 
 export default function Login() {
   const theme = useTheme();
   const [showPassword, setShowPassword] = React.useState(false);
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
   const [emailValid, setEmailValid] = React.useState(true);
   const [passwordValid, setPasswordValid] = React.useState(true);
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -49,7 +52,8 @@ export default function Login() {
             fullWidth={true}
             error={!emailValid}
             onBlur={(event) => {
-              if (validateEmail(event.target.value)) {
+              setEmail(event.target.value)
+              if (validateEmail(email)) {
                 setEmailValid(true)
               } else {
                 setEmailValid(false)
@@ -58,7 +62,7 @@ export default function Login() {
           />
           {!emailValid && (
             <FormHelperText error id="email-error">
-              Please enter a valid email address.
+              Email address is invalid
             </FormHelperText>
           )}
         </FormControl>
@@ -86,7 +90,8 @@ export default function Login() {
             fullWidth={true}
             error={!passwordValid}
             onBlur={(event) => {
-              if (event.target.value.length == 0) {
+              setPassword(event.target.value)
+              if (password.length == 0) {
                 setPasswordValid(false)
               } else {
                 setPasswordValid(true)
@@ -95,10 +100,23 @@ export default function Login() {
           />
           {!passwordValid && (
             <FormHelperText error id="password-error">
-              Password field cannot be empty.
+              Password must not be empty
             </FormHelperText>
           )}
         </FormControl>
+        <Button sx={{
+          m: 5,
+          padding: 2,
+          backgroundColor: theme.palette.secondary.main,
+          '&:hover': {
+            backgroundColor: theme.palette.secondary.dark,
+          },
+          color: theme.palette.secondary.contrastText
+        }}
+          endIcon={<LoginIcon />}
+        >
+          <Typography textTransform={'capitalize'}>Login</Typography>
+        </Button>
       </Grid2>
     </Box>
   )
