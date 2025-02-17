@@ -59,6 +59,9 @@ export default function Login() {
                 setEmailValid(false)
               }
             }}
+            onFocus={() => {
+              setEmailValid(true);
+            }}
           />
           {!emailValid && (
             <FormHelperText error id="email-error">
@@ -96,6 +99,9 @@ export default function Login() {
               } else {
                 setPasswordValid(true)
               }
+            }}
+            onFocus={() => {
+              setPasswordValid(true)
             }}
           />
           {!passwordValid && (
