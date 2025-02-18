@@ -8,10 +8,16 @@ export default function Logo() {
 
   return (
     <Box
+      color="inherit"
+      aria-label="logo"
       component="img"
       sx={{
-        height: 20,
-        width: 20,
+        mr: 2,
+        height: 30,
+        width: 30,
+        "&:hover": {
+          cursor: "pointer",
+        },
       }}
       alt="Logo image to return to home page."
       src={LogoImage}

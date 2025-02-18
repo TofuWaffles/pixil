@@ -18,6 +18,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import HomeIcon from '@mui/icons-material/Home';
 import UploadButton from './UploadButton';
+import Logo from './Logo';
 
 // TODO: Adjust width to fit smaller devices
 const drawerWidth = 240;
@@ -192,6 +193,7 @@ export default function MainDrawer() {
           >
             <MenuIcon />
           </IconButton>
+          <Logo />
           <Typography variant="h5" noWrap component="div">
             Pixil
           </Typography>
