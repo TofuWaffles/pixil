@@ -13,7 +13,7 @@ export function Gallery() {
   React.useEffect(() => {
     const fetchImages = async () => {
       try {
-        const response = await fetch(import.meta.env.VITE_BACKEND_URL + "/media");
+        const response = await fetch(import.meta.env.VITE_BACKEND_URL + "/media?status=0");
         if (!response.ok) {
           throw new Error(`Error fetching image IDs: ${response.statusText}`);
         }

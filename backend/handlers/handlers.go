@@ -40,7 +40,7 @@ func (e Env) AllActiveMedia(w http.ResponseWriter, r *http.Request) {
 	mediaStatus := r.URL.Query().Get("status")
 
 	if mediaStatus == "" {
-		media, err := models.GetAllMedia(r.Context(), e.Database, models.Active)
+		media, err := models.GetAllMedia(r.Context(), e.Database, -1)
 		if err != nil {
 			http.Error(w, genericErrMsg, http.StatusInternalServerError)
 			e.Logger.Error("Error trying to all active media", "error", err.Error())
