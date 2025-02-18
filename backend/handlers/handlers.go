@@ -37,16 +37,34 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 // Gets all active media.
 func (e Env) AllActiveMedia(w http.ResponseWriter, r *http.Request) {
-	media, err := models.GetAllMedia(r.Context(), e.Database, models.Active)
-	if err != nil {
-		http.Error(w, genericErrMsg, http.StatusInternalServerError)
-		e.Logger.Error("Error trying to all active media", "error", err.Error())
-		return
-	}
+	mediaStatus := r.URL.Query().Get("status")
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(media)
+	if mediaStatus == "" {
+		media, err := models.GetAllMedia(r.Context(), e.Database, models.Active)
+		if err != nil {
+			http.Error(w, genericErrMsg, http.StatusInternalServerError)
+			e.Logger.Error("Error trying to all active media", "error", err.Error())
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(media)
+	} else {
+		mediaStatus, err := strconv.Atoi(mediaStatus)
+		if err != nil {
+			http.Error(w, "The mediaStatus parameter must be a number", http.StatusBadRequest)
+			return
+		}
+		media, err := models.GetAllMedia(r.Context(), e.Database, mediaStatus)
+		if err != nil {
+			http.Error(w, genericErrMsg, http.StatusInternalServerError)
+			e.Logger.Error("Error trying to all active media", "error", err.Error())
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(media)
+	}
 }
 
 // Get a thumbnail of a media with the ID specified in the URL parameter.
