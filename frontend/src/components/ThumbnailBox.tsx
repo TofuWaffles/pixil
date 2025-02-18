@@ -16,6 +16,11 @@ export default function ThumbnailBox({ thumbnail }: {
       component="img"
       alt="User Image"
       src={thumbnail.src}
+      sx={{
+        "&:hover": {
+          cursor: "pointer",
+        },
+      }}
     />
   );
 }

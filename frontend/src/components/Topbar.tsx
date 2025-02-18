@@ -6,7 +6,6 @@ import Logo from "./Logo";
 
 
 export default function TopBar({ title }: { title: string }) {
-
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
