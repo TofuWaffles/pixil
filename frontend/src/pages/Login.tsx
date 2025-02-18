@@ -55,7 +55,10 @@ export default function Login() {
             autoFocus={true}
             fullWidth={true}
             error={!emailValid}
+            // TODO: Fix semi-broken onBlur check
             onBlur={(event) => {
+              console.log("Email blurred, email valid: ", emailValid);
+
               setEmail(event.target.value)
               if (validateEmail(email)) {
                 setEmailValid(true)
