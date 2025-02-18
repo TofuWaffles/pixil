@@ -11,7 +11,63 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (e Env) Register(w http.ResponseWriter, r *http.Request) {
+func (e Env) User(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		e.GetUser(w, r)
+		return
+	} else if r.Method == "POST" {
+		e.PostUser(w, r)
+		return
+	}
+
+	w.WriteHeader(http.StatusBadRequest)
+}
+
+func (e Env) GetUser(w http.ResponseWriter, r *http.Request) {
+	type SanitizedUser struct {
+		email     string
+		username  string
+		user_type int
+	}
+
+	email := r.URL.Query().Get("email")
+
+	if email == "" {
+		users, err := models.GetAllUsers(r.Context(), e.Database)
+		if err != nil {
+			http.Error(w, genericErrMsg, http.StatusInternalServerError)
+			e.Logger.Error("Error while trying to get all users from the database", "error", err)
+		}
+		var sanitizedUsers []SanitizedUser
+		for _, user := range users {
+			sanitizedUsers = append(sanitizedUsers, SanitizedUser{
+				email:     user.Email,
+				username:  user.Username,
+				user_type: user.UserType,
+			})
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(sanitizedUsers)
+		return
+	}
+	user, err := models.GetUser(r.Context(), e.Database, email)
+	if err != nil {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Error while trying to get a user from the database", "error", err, "email", email)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(SanitizedUser{
+			email:     user.Email,
+			username:  user.Username,
+			user_type: user.UserType,
+		})
+	}
+}
+
+func (e Env) PostUser(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var registerUser struct {
 		email    string

@@ -56,6 +56,16 @@ func GetUser(ctx context.Context, db *pgxpool.Pool, email string) (User, error) 
 	return pgx.CollectOneRow(rows, pgx.RowToStructByName[User])
 }
 
+func GetAllUsers(ctx context.Context, db *pgxpool.Pool) ([]User, error) {
+	var rows pgx.Rows
+	rows, _ = db.Query(ctx,
+		`SELECT email, username, password_hash, user_type
+		FROM "user"`,
+	)
+
+	return pgx.CollectRows(rows, pgx.RowToStructByName[User])
+}
+
 // Inserts a user to the database.
 func AddUser(ctx context.Context, db *pgxpool.Pool, user User) error {
 	_, err := db.Exec(ctx,
