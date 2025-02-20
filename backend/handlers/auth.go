@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"time"
 
 	models "github.com/TofuWaffles/pixil/database"
 	"github.com/golang-jwt/jwt/v5"
@@ -137,10 +138,15 @@ func (e Env) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := jwt.NewWithClaims(jwt.SigningMethodES256,
+	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
-			"email":     user.Email,
-			"expiresIn": "7d",
+			"email":    user.Email,
+			"username": user.Username,
+			"userType": user.UserType,
+			"sub":      "auth",
+			"iss":      "pixil",
+			"exp":      time.Now().Add(time.Hour * 24 * 7).Unix(),
+			"iat":      time.Now().Unix(),
 		}).SignedString(os.Getenv("JWT_KEY"))
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
