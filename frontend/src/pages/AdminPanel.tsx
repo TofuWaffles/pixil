@@ -4,12 +4,20 @@ import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import useTheme from "@mui/material/styles/useTheme";
-import Typography from "@mui/material/Typography";
 import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
 import React from "react";
-import { Grid2 } from "@mui/material";
+import { User } from "../types/props";
+import Grid2 from "@mui/material/Grid2";
+import Paper from "@mui/material/Paper";
+import TableContainer from "@mui/material/TableContainer";
+import Table from "@mui/material/Table";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Alert from "@mui/material/Alert";
+import TableCell from "@mui/material/TableCell";
+import TableBody from "@mui/material/TableBody";
 
 export default function AdminPanel() {
   const theme = useTheme();
@@ -44,7 +52,7 @@ export default function AdminPanel() {
           Item One
         </TabPanel>
         <TabPanel value={value} index={1} dir={theme.direction}>
-          Item Two
+          <UserSettings />
         </TabPanel>
         <TabPanel value={value} index={2} dir={theme.direction}>
           Item Three
@@ -55,9 +63,66 @@ export default function AdminPanel() {
 }
 
 function UserSettings() {
-  <Grid2
-    direction="row"
-  ></Grid2>
+  const [users, setUsers] = React.useState<User[]>([]);
+  const [userSettingsError, setUserSettingsError] = React.useState("");
+
+  React.useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const usersResponse = await fetch(import.meta.env.VITE_BACKEND_URL + `/user`);
+        if (!usersResponse.ok) {
+          throw new Error(`Error fetching users: ${usersResponse.statusText}`);
+        }
+
+        const users: User[] = await usersResponse.json();
+        setUsers(users);
+      } catch (err: any) {
+        setUserSettingsError(err);
+      }
+    }
+    fetchUsers()
+  }, []);
+
+  return (
+    <Grid2
+      container
+      spacing={0}
+      direction="column"
+      alignItems="center"
+      width="60%"
+      sx={{
+        minHeight: '100vh',
+      }}
+    >
+      {
+        (userSettingsError.length > 0) && <Alert severity="error" variant="filled" sx={{ m: 5 }}>{userSettingsError}</Alert>
+      }
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Email Address</TableCell>
+              <TableCell>Username</TableCell>
+              <TableCell>Account Type</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {
+              users.map((user) => (
+                < TableRow
+                  key={user.email}
+                >
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.username}</TableCell>
+                  <TableCell>{user.userType}</TableCell>
+                </TableRow>
+              ))
+            }
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Grid2 >
+  )
 }
 
 interface TabPanelProps {

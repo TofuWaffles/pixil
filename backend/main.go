@@ -25,12 +25,14 @@ func main() {
 		Logger:   slog.Default(),
 	}
 
+	// TODO: Guard sensitive routes with auth middleware
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", env.Chain(env.BasicChain(handlers.Home), env.GetOnly()))
 	mux.HandleFunc("/thumbnail", env.Chain(env.BasicChain(env.Thumbnail), env.GetOnly()))
 	mux.HandleFunc("/media", env.Chain(env.BasicChain(env.Media)))
 	mux.HandleFunc("/download-test", env.Chain(env.BasicChain(env.DownloadTest), env.GetOnly()))
 	mux.HandleFunc("/login", env.Chain(env.BasicChain(env.Login)))
+	mux.HandleFunc("/user", env.BasicChain(env.User))
 
 	log.Println("Starting server on :4000")
 

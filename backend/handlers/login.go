@@ -37,8 +37,9 @@ func (e Env) GetUser(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			http.Error(w, genericErrMsg, http.StatusInternalServerError)
 			e.Logger.Error("Error while trying to get all users from the database", "error", err)
+			return
 		}
-		var sanitizedUsers []SanitizedUser
+		sanitizedUsers := []SanitizedUser{}
 		for _, user := range users {
 			sanitizedUsers = append(sanitizedUsers, SanitizedUser{
 				email:     user.Email,
@@ -52,6 +53,7 @@ func (e Env) GetUser(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(sanitizedUsers)
 		return
 	}
+
 	user, err := models.GetUser(r.Context(), e.Database, email)
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)

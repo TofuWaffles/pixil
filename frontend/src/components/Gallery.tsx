@@ -18,8 +18,8 @@ export function Gallery() {
           throw new Error(`Error fetching image IDs: ${response.statusText}`);
         }
 
-        const imageList = await response.json();
-        const media = imageList.map((item: { id: number, createdAt: string }) => { return { id: item.id, createdAt: new Date(item.createdAt) } });
+        const mediaList = await response.json();
+        const media = mediaList.map((item: { id: number, createdAt: string }) => { return { id: item.id, createdAt: new Date(item.createdAt) } });
 
         const imagePromises = media.map(async (m: Thumbnail) => {
           const imageResponse = await fetch(import.meta.env.VITE_BACKEND_URL + `/thumbnail?id=${m.id}`);
