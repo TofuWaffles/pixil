@@ -161,11 +161,9 @@ function TabPanel(props: TabPanelProps) {
         className="flex h-lvh w-screen justify-center"
         {...other}
       >
-        {value === index && (
-          <Box sx={{ p: 3 }}>
-            {children}
-          </Box>
-        )}
+        <Box sx={{ p: 3 }}>
+          {children}
+        </Box>
       </div>
     );
   }
