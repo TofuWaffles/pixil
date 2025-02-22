@@ -18,6 +18,11 @@ import TableRow from "@mui/material/TableRow";
 import Alert from "@mui/material/Alert";
 import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import Typography from "@mui/material/Typography";
+import AccordionDetails from "@mui/material/AccordionDetails";
 
 export default function AdminPanel() {
   const theme = useTheme();
@@ -94,6 +99,20 @@ function UserSettings() {
       {
         (userSettingsError.length > 0) && <Alert severity="error" variant="filled" sx={{ m: 5 }}>{userSettingsError}</Alert>
       }
+      <Accordion sx={{
+        m: 3,
+        width: "100%",
+      }}>
+        <AccordionSummary
+          expandIcon={<ExpandMore />}
+          aria-controls="add-user-expand"
+          id="add-user-header"
+        >
+          <Typography component="span">Create User</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+        </AccordionDetails>
+      </Accordion>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -132,20 +151,22 @@ interface TabPanelProps {
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`full-width-tabpanel-${index}`}
-      aria-labelledby={`full-width-tab-${index}`}
-      className="flex w-screen justify-center"
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
+  if (value === index) {
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`full-width-tabpanel-${index}`}
+        aria-labelledby={`full-width-tab-${index}`}
+        className="flex h-lvh w-screen justify-center"
+        {...other}
+      >
+        {value === index && (
+          <Box sx={{ p: 3 }}>
+            {children}
+          </Box>
+        )}
+      </div>
+    );
+  }
 }
