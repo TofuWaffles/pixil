@@ -89,10 +89,7 @@ function UserSettings() {
       spacing={0}
       direction="column"
       alignItems="center"
-      width="60%"
-      sx={{
-        minHeight: '100vh',
-      }}
+      width="80vw"
     >
       {
         (userSettingsError.length > 0) && <Alert severity="error" variant="filled" sx={{ m: 5 }}>{userSettingsError}</Alert>
@@ -109,7 +106,7 @@ function UserSettings() {
           <TableBody>
             {
               users.map((user) => (
-                < TableRow
+                <TableRow
                   key={user.email}
                 >
                   <TableCell>{user.email}</TableCell>
@@ -141,6 +138,7 @@ function TabPanel(props: TabPanelProps) {
       hidden={value !== index}
       id={`full-width-tabpanel-${index}`}
       aria-labelledby={`full-width-tab-${index}`}
+      className="flex w-screen justify-center"
       {...other}
     >
       {value === index && (
