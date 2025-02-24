@@ -23,6 +23,9 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import Typography from "@mui/material/Typography";
 import AccordionDetails from "@mui/material/AccordionDetails";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import OutlinedInput from "@mui/material/OutlinedInput";
 
 export default function AdminPanel() {
   const theme = useTheme();
@@ -68,6 +71,7 @@ export default function AdminPanel() {
 }
 
 function UserSettings() {
+  const theme = useTheme();
   const [users, setUsers] = React.useState<User[]>([]);
   const [userSettingsError, setUserSettingsError] = React.useState("");
 

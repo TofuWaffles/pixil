@@ -16,9 +16,9 @@ export default function Login() {
   const theme = useTheme();
   const [showPassword, setShowPassword] = React.useState(false);
   const [email, setEmail] = React.useState("");
+  const [emailError, setEmailError] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [emailValid, setEmailValid] = React.useState(true);
-  const [passwordValid, setPasswordValid] = React.useState(true);
+  const [passwordError, setPasswordError] = React.useState("");
   const [loginError, setLoginError] = React.useState("");
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -54,25 +54,23 @@ export default function Login() {
             label="Email Address"
             autoFocus={true}
             fullWidth={true}
-            error={!emailValid}
+            error={emailError !== ""}
             // TODO: Fix semi-broken onBlur check
             onBlur={(event) => {
-              console.log("Email blurred, email valid: ", emailValid);
-
               setEmail(event.target.value)
               if (validateEmail(email)) {
-                setEmailValid(true)
+                setEmailError("Invalid email entered. Email must be in the form of johndoe@mail.com");
               } else {
-                setEmailValid(false)
+                setEmailError("");
               }
             }}
             onFocus={() => {
-              setEmailValid(true);
+              setEmailError("");
             }}
           />
-          {!emailValid && (
+          {emailError !== "" && (
             <FormHelperText error id="email-error">
-              Email address is invalid
+              {emailError}
             </FormHelperText>
           )}
         </FormControl>
@@ -98,20 +96,20 @@ export default function Login() {
             }
             label="Password"
             fullWidth={true}
-            error={!passwordValid}
+            error={passwordError !== ""}
             onBlur={(event) => {
               setPassword(event.target.value)
               if (password.length == 0) {
-                setPasswordValid(false)
+                setPasswordError("Password must not be empty");
               } else {
-                setPasswordValid(true)
+                setPasswordError("");
               }
             }}
             onFocus={() => {
-              setPasswordValid(true)
+              setPasswordError("");
             }}
           />
-          {!passwordValid && (
+          {passwordError !== "" && (
             <FormHelperText error id="password-error">
               Password must not be empty
             </FormHelperText>
@@ -128,7 +126,7 @@ export default function Login() {
         }}
           endIcon={<LoginIcon />}
           onClick={() => {
-            if (!emailValid || !passwordValid) {
+            if (emailError !== "" || passwordError !== "") {
               setLoginError("Please correct the email or password fields before logging in");
               return;
             }
