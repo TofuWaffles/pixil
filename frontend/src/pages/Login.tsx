@@ -165,10 +165,8 @@ const loginOnClick = (email: string, password: string, setLoginError: React.Disp
     } catch (errStatus: any) {
       switch (errStatus) {
         case 401:
-          setLoginError("Incorrect password entered. Please try again.");
-          break;
         case 404:
-          setLoginError("A user with the given email address was not found.");
+          setLoginError("Invalid email address or password entered.");
           break;
         default:
           setLoginError("An unexpected error occured. Please let the administrator know if the issue persists.");
