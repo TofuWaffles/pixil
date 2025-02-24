@@ -5,7 +5,7 @@ import ListItem from "@mui/material/ListItem";
 import List from "@mui/material/List";
 
 
-export function Gallery() {
+export default function Gallery() {
   const [thumbnails, setThumbnails] = React.useState<{ id: number; createdAt: Date; src: string }[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
