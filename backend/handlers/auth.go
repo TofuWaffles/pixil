@@ -76,12 +76,23 @@ func (e Env) PostUser(w http.ResponseWriter, r *http.Request) {
 		email    string
 		username string
 		password string
-		isAdmin  bool
+		userType int
 	}
 	err := decoder.Decode(&registerUser)
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
 		e.Logger.Error("Unable to decode response from json body", "error", err, "body", r.Body)
+		return
+	}
+
+	_, err = models.GetUser(r.Context(), e.Database, registerUser.email)
+	if err == nil {
+		http.Error(w, "User already exists", http.StatusConflict)
+		return
+	}
+	if err != pgx.ErrNoRows {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to check if user already exists in the database", "email", registerUser.email, "error", err)
 		return
 	}
 
@@ -91,16 +102,11 @@ func (e Env) PostUser(w http.ResponseWriter, r *http.Request) {
 		e.Logger.Error("Unable to hash the provided password", "error", err)
 	}
 
-	userType := models.Member
-	if registerUser.isAdmin {
-		userType = models.Admin
-	}
-
 	if err = models.AddUser(r.Context(), e.Database, models.User{
 		Email:        registerUser.email,
 		Username:     registerUser.username,
 		PasswordHash: string(passwordHash),
-		UserType:     userType,
+		UserType:     registerUser.userType,
 	}); err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
 		e.Logger.Error("Unable to add user to the database", "error", err)
