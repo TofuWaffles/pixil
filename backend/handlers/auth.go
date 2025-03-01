@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -26,9 +27,9 @@ func (e Env) User(w http.ResponseWriter, r *http.Request) {
 
 func (e Env) GetUser(w http.ResponseWriter, r *http.Request) {
 	type SanitizedUser struct {
-		email     string
-		username  string
-		user_type int
+		Email    string `json:"email"`
+		Username string `json:"username"`
+		UserType int    `json:"userType"`
 	}
 
 	email := r.URL.Query().Get("email")
@@ -43,15 +44,23 @@ func (e Env) GetUser(w http.ResponseWriter, r *http.Request) {
 		sanitizedUsers := []SanitizedUser{}
 		for _, user := range users {
 			sanitizedUsers = append(sanitizedUsers, SanitizedUser{
-				email:     user.Email,
-				username:  user.Username,
-				user_type: user.UserType,
+				Email:    user.Email,
+				Username: user.Username,
+				UserType: user.UserType,
 			})
 		}
 
+		fmt.Println(sanitizedUsers)
+
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(sanitizedUsers)
+		err = json.NewEncoder(w).Encode(sanitizedUsers)
+		if err != nil {
+			http.Error(w, genericErrMsg, http.StatusInternalServerError)
+			e.Logger.Error("Error trying to get all users", "error", err)
+			return
+		}
+
 		return
 	}
 
@@ -63,9 +72,9 @@ func (e Env) GetUser(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(SanitizedUser{
-			email:     user.Email,
-			username:  user.Username,
-			user_type: user.UserType,
+			Email:    user.Email,
+			Username: user.Username,
+			UserType: user.UserType,
 		})
 	}
 }
