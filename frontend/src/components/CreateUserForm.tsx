@@ -81,7 +81,7 @@ export default function CreateUserForm() {
             error={emailError !== ""}
             onBlur={(event) => {
               setEmail(event.target.value)
-              checkEmail(email, setEmailError);
+              checkEmail(event.target.value, setEmailError);
             }}
             onFocus={() => {
               setEmailError("");
@@ -113,7 +113,7 @@ export default function CreateUserForm() {
             error={passwordError !== ""}
             onBlur={(event) => {
               setPassword(event.target.value);
-              checkPassword(password, setPasswordError);
+              checkPassword(event.target.value, setPasswordError);
             }}
             onFocus={() => {
               setEmailError("");
@@ -134,7 +134,7 @@ export default function CreateUserForm() {
             error={repeatPasswordError !== ""}
             onBlur={(event) => {
               setRepeatPassword(event.target.value);
-              checkRepeatPassword(password, repeatPassword, setRepeatPasswordError);
+              checkRepeatPassword(password, event.target.value, setRepeatPasswordError);
             }}
             onFocus={() => {
               setRepeatPasswordError("");
@@ -217,11 +217,9 @@ export default function CreateUserForm() {
 }
 
 function checkEmail(email: string, setEmailError: React.Dispatch<React.SetStateAction<string>>) {
-  if (email.length == 0) {
-    setEmailError("A valid email address must be provided")
-    return
-  }
   if (!validateEmail(email)) {
+    console.log("Invalid email: ", email);
+
     setEmailError("Invalid email address entered.");
   } else {
     setEmailError("");

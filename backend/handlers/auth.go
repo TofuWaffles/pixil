@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -49,8 +48,6 @@ func (e Env) GetUser(w http.ResponseWriter, r *http.Request) {
 				UserType: user.UserType,
 			})
 		}
-
-		fmt.Println(sanitizedUsers)
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)

@@ -58,7 +58,7 @@ export default function Login() {
             // TODO: Fix semi-broken onBlur check
             onBlur={(event) => {
               setEmail(event.target.value)
-              if (validateEmail(email)) {
+              if (validateEmail(event.target.value)) {
                 setEmailError("Invalid email entered. Email must be in the form of johndoe@mail.com");
               } else {
                 setEmailError("");
@@ -99,7 +99,7 @@ export default function Login() {
             error={passwordError !== ""}
             onBlur={(event) => {
               setPassword(event.target.value)
-              if (password.length == 0) {
+              if (event.target.value === "") {
                 setPasswordError("Password must not be empty");
               } else {
                 setPasswordError("");
