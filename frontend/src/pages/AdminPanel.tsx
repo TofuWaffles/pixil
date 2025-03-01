@@ -128,9 +128,9 @@ function UserSettings() {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Email Address</TableCell>
-              <TableCell>Username</TableCell>
-              <TableCell>Account Type</TableCell>
+              <TableCell><Typography><Box sx={{ fontWeight: "bold" }}>Email Address</Box></Typography></TableCell>
+              <TableCell><Typography><Box sx={{ fontWeight: "bold" }}>Username</Box></Typography></TableCell>
+              <TableCell><Typography><Box sx={{ fontWeight: "bold" }}>Account Type</Box></Typography></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -141,7 +141,9 @@ function UserSettings() {
                 >
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.username}</TableCell>
-                  <TableCell>{user.userType}</TableCell>
+                  <TableCell>{
+                    user.userType == 0 ? "Member" : "Admin"
+                  }</TableCell>
                 </TableRow>
               ))
             }
