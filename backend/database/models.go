@@ -79,6 +79,12 @@ func AddUser(ctx context.Context, db *pgxpool.Pool, user User) error {
 	return err
 }
 
+func CheckUserExists(ctx context.Context, db *pgxpool.Pool, email string) (bool, error) {
+	var res bool
+	err := db.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM "user" WHERE email = $1)`, email).Scan(&res)
+	return res, err
+}
+
 // Retrieves media of a given ID from the database. This does not include the file contents.
 func GetMedia(ctx context.Context, db *pgxpool.Pool, id int) (Media, error) {
 	rows, err := db.Query(ctx,

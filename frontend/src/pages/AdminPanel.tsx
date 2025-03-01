@@ -24,6 +24,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import Typography from "@mui/material/Typography";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import CreateUserForm from "../components/CreateUserForm";
+import backendRequest from "../utils/BackendRequest";
 
 export default function AdminPanel() {
   const theme = useTheme();
@@ -75,7 +76,7 @@ function UserSettings() {
   React.useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const usersResponse = await fetch(import.meta.env.VITE_BACKEND_URL + `/user`);
+        const usersResponse = await backendRequest(null, "GET", "/user")
         if (!usersResponse.ok) {
           throw new Error(`Error fetching users: ${usersResponse.statusText}`);
         }
@@ -87,6 +88,7 @@ function UserSettings() {
       }
     }
     fetchUsers()
+
   }, []);
 
   return (
@@ -128,7 +130,7 @@ function UserSettings() {
             {
               users.map((user) => (
                 <TableRow
-                  key={user.email}
+                  key={user.email + "-row"}
                 >
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.username}</TableCell>
@@ -161,6 +163,7 @@ function TabPanel(props: TabPanelProps) {
         id={`full-width-tabpanel-${index}`}
         aria-labelledby={`full-width-tab-${index}`}
         className="flex h-lvh w-screen justify-center"
+        key={value}
         {...other}
       >
         <Box sx={{ p: 3 }}>

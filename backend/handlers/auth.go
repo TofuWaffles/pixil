@@ -73,10 +73,10 @@ func (e Env) GetUser(w http.ResponseWriter, r *http.Request) {
 func (e Env) PostUser(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var registerUser struct {
-		email    string
-		username string
-		password string
-		userType int
+		Email    string `json:"email"`
+		Username string `json:"username"`
+		Password string `json:"passowrd"`
+		UserType int    `json:"userType"`
 	}
 	err := decoder.Decode(&registerUser)
 	if err != nil {
@@ -85,31 +85,34 @@ func (e Env) PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = models.GetUser(r.Context(), e.Database, registerUser.email)
-	if err == nil {
-		http.Error(w, "User already exists", http.StatusConflict)
+	exists, err := models.CheckUserExists(r.Context(), e.Database, registerUser.Email)
+	if err != nil {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to check if the user exists in the database", "error", err, "email", registerUser.Email)
 		return
 	}
-	if err != pgx.ErrNoRows {
-		http.Error(w, genericErrMsg, http.StatusInternalServerError)
-		e.Logger.Error("Unable to check if user already exists in the database", "email", registerUser.email, "error", err)
+	if exists {
+		http.Error(w, "User already exists", http.StatusConflict)
+		e.Logger.Error("User already exists lol", "email", registerUser.Email)
 		return
 	}
 
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte(registerUser.password), bcrypt.DefaultCost)
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(registerUser.Password), bcrypt.DefaultCost)
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
 		e.Logger.Error("Unable to hash the provided password", "error", err)
+		return
 	}
 
 	if err = models.AddUser(r.Context(), e.Database, models.User{
-		Email:        registerUser.email,
-		Username:     registerUser.username,
+		Email:        registerUser.Email,
+		Username:     registerUser.Username,
 		PasswordHash: string(passwordHash),
-		UserType:     registerUser.userType,
+		UserType:     registerUser.UserType,
 	}); err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
 		e.Logger.Error("Unable to add user to the database", "error", err)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)

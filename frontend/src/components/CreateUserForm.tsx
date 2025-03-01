@@ -14,6 +14,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Alert from "@mui/material/Alert";
 import PersonAdd from "@mui/icons-material/PersonAdd";
+import backendRequest from "../utils/BackendRequest";
 
 
 export default function CreateUserForm() {
@@ -27,6 +28,7 @@ export default function CreateUserForm() {
   const [repeatPasswordError, setRepeatPasswordError] = React.useState("");
   const [userType, setUserType] = React.useState(0);
   const [createUserError, setCreateUserError] = React.useState("");
+  const [createUserSuccess, setCreateUserSuccess] = React.useState("");
 
   return (
     <Box
@@ -63,6 +65,9 @@ export default function CreateUserForm() {
           }
         }}
       >
+        {
+          (createUserSuccess.length > 0) && <Alert severity="success" variant="filled" sx={{ m: 5 }}>{createUserSuccess}</Alert>
+        }
         {
           (createUserError.length > 0) && <Alert severity="error" variant="filled" sx={{ m: 5 }}>{createUserError}</Alert>
         }
@@ -168,7 +173,7 @@ export default function CreateUserForm() {
           color: theme.palette.secondary.contrastText
         }}
           endIcon={<PersonAdd />}
-          onClick={() => {
+          onClick={async () => {
             checkEmail(email, setEmailError);
             checkPassword(password, setPasswordError);
             checkRepeatPassword(password, repeatPassword, setRepeatPasswordError);
@@ -176,16 +181,33 @@ export default function CreateUserForm() {
               setCreateUserError("Some fields are invalid. Please correct them before submitting");
               return;
             }
-            // TODO: Add create user http request here
-            createUserOnClick({
-              email: email,
-              username: username,
-              password: password,
-              userType: userType,
-            },
-              setCreateUserError,
-            )
-          }}
+            try {
+              const response = await backendRequest({
+                email: email,
+                username: username,
+                password: password,
+                userType: userType,
+              },
+                "POST",
+                "/user",
+              )
+              if (response.ok) {
+                setCreateUserSuccess("The new user has been created!");
+                setCreateUserError("");
+              } else {
+                throw response.status;
+              }
+            } catch (statusCode: any) {
+              switch (statusCode) {
+                case 409:
+                  setCreateUserError("User with the provided email address already exists");
+                  break;
+                default:
+                  setCreateUserError("An internal server error occured. You may want to check the backend logs to see what went wrong")
+              }
+            }
+          }
+          }
         >
           <Typography textTransform={'capitalize'}>Create User</Typography>
         </Button>
@@ -221,43 +243,4 @@ function checkRepeatPassword(password: string, repeatPassword: string, setRepeat
   } else {
     setRepeatPasswordError("");
   }
-}
-
-interface NewUser {
-  email: string,
-  username: string,
-  password: string,
-  userType: number,
-}
-
-function createUserOnClick(user: NewUser, setCreateUserError: React.Dispatch<React.SetStateAction<string>>) {
-  const createUser = async () => {
-    try {
-      const response = await fetch(import.meta.env.VITE_BACKEND_URL + "/user", {
-        method: "POST",
-        body: JSON.stringify(user),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8"
-        }
-      });
-      if (!response.ok) {
-        throw response.status
-      }
-
-      const jsonResponse: { token: string } = await response.json()
-
-      console.log(jsonResponse.token);
-    } catch (errStatus: any) {
-      switch (errStatus) {
-        case 409:
-          setCreateUserError("User with the provided email already exists")
-          break;
-        default:
-          setCreateUserError("An unexpected error occured. Please check the backend logs for more information");
-          break;
-      }
-    }
-  }
-
-  createUser();
 }
