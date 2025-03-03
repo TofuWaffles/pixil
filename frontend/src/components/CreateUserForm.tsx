@@ -16,7 +16,6 @@ import Alert from "@mui/material/Alert";
 import PersonAdd from "@mui/icons-material/PersonAdd";
 import backendRequest from "../utils/BackendRequest";
 
-
 export default function CreateUserForm() {
   const theme = useTheme();
   const [email, setEmail] = React.useState("");

@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	models "github.com/TofuWaffles/pixil/database"
@@ -81,7 +83,7 @@ func (e Env) PostUser(w http.ResponseWriter, r *http.Request) {
 	var registerUser struct {
 		Email    string `json:"email"`
 		Username string `json:"username"`
-		Password string `json:"passowrd"`
+		Password string `json:"password"`
 		UserType int    `json:"userType"`
 	}
 	err := decoder.Decode(&registerUser)
@@ -90,6 +92,8 @@ func (e Env) PostUser(w http.ResponseWriter, r *http.Request) {
 		e.Logger.Error("Unable to decode response from json body", "error", err, "body", r.Body)
 		return
 	}
+	registerUser.Email = strings.ToLower(registerUser.Email)
+	e.Logger.Debug("User", "user", registerUser)
 
 	exists, err := models.CheckUserExists(r.Context(), e.Database, registerUser.Email)
 	if err != nil {
@@ -103,6 +107,7 @@ func (e Env) PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("Hashing password: ", registerUser.Password)
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(registerUser.Password), bcrypt.DefaultCost)
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
@@ -127,10 +132,11 @@ func (e Env) PostUser(w http.ResponseWriter, r *http.Request) {
 func (e Env) Login(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var loginUser struct {
-		email    string
-		password string
+		Email    string
+		Password string
 	}
 	err := decoder.Decode(&loginUser)
+	loginUser.Email = strings.ToLower(loginUser.Email)
 
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
@@ -138,7 +144,7 @@ func (e Env) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := models.GetUser(r.Context(), e.Database, loginUser.email)
+	user, err := models.GetUser(r.Context(), e.Database, loginUser.Email)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			http.Error(w, "No user with the provided email was found.", http.StatusNotFound)
@@ -148,8 +154,10 @@ func (e Env) Login(w http.ResponseWriter, r *http.Request) {
 		e.Logger.Error("Error trying to retrieve user from database", "error", err)
 	}
 
-	if err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(loginUser.password)); err != nil {
+	if err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(loginUser.Password)); err != nil {
 		http.Error(w, "Wrong password provided.", http.StatusUnauthorized)
+		hash, _ := bcrypt.GenerateFromPassword([]byte(loginUser.Password), bcrypt.DefaultCost)
+		e.Logger.Error("Wrong password", "password", loginUser.Password, "error", err, "hash", hash)
 		return
 	}
 
@@ -162,7 +170,7 @@ func (e Env) Login(w http.ResponseWriter, r *http.Request) {
 			"iss":      "pixil",
 			"exp":      time.Now().Add(time.Hour * 24 * 7).Unix(),
 			"iat":      time.Now().Unix(),
-		}).SignedString(os.Getenv("JWT_KEY"))
+		}).SignedString([]byte(os.Getenv("JWT_KEY")))
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
 		e.Logger.Error("Error generating JWT.", "error", err, "user_email", user.Email)
@@ -170,5 +178,5 @@ func (e Env) Login(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(struct{ token string }{token: token})
+	json.NewEncoder(w).Encode(struct{ Token string }{Token: token})
 }

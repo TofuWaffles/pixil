@@ -11,6 +11,7 @@ import useTheme from "@mui/material/styles/useTheme";
 import React, { SetStateAction } from "react";
 import validateEmail from "../utils/ValidateEmail";
 import LoginIcon from '@mui/icons-material/Login';
+import backendRequest from "../utils/BackendRequest";
 
 export default function Login() {
   const theme = useTheme();
@@ -58,8 +59,8 @@ export default function Login() {
             // TODO: Fix semi-broken onBlur check
             onBlur={(event) => {
               setEmail(event.target.value)
-              if (validateEmail(event.target.value)) {
-                setEmailError("Invalid email entered. Email must be in the form of johndoe@mail.com");
+              if (!validateEmail(event.target.value)) {
+                setEmailError("Invalid email entered.");
               } else {
                 setEmailError("");
               }
@@ -126,7 +127,7 @@ export default function Login() {
         }}
           endIcon={<LoginIcon />}
           onClick={() => {
-            if (emailError !== "" || passwordError !== "") {
+            if (emailError.length != 0 || passwordError.length != 0) {
               setLoginError("Please correct the email or password fields before logging in");
               return;
             }
@@ -140,7 +141,17 @@ export default function Login() {
   )
 }
 
-const loginOnClick = (email: string, password: string, setLoginError: React.Dispatch<SetStateAction<string>>) => {
+async function loginOnClick(email: string, password: string, setLoginError: React.Dispatch<SetStateAction<string>>) {
+  // const response = await backendRequest({
+  //   email: email,
+  //   password: password,
+  // },
+  //   "POST",
+  //   "/login",
+  // )
+  // if (!response.ok) {
+  //   throw response.status
+  // }
   const fetchToken = async () => {
     try {
       const response = await fetch(import.meta.env.VITE_BACKEND_URL + "/login", {
@@ -159,7 +170,7 @@ const loginOnClick = (email: string, password: string, setLoginError: React.Disp
 
       const jsonResponse: { token: string } = await response.json()
 
-      console.log(jsonResponse.token);
+      console.log(jsonResponse);
     } catch (errStatus: any) {
       switch (errStatus) {
         case 401:
