@@ -56,7 +56,6 @@ export default function Login() {
             autoFocus={true}
             fullWidth={true}
             error={emailError !== ""}
-            // TODO: Fix semi-broken onBlur check
             onBlur={(event) => {
               setEmail(event.target.value)
               if (!validateEmail(event.target.value)) {

@@ -15,6 +15,10 @@ import Typography from "@mui/material/Typography";
 import Alert from "@mui/material/Alert";
 import PersonAdd from "@mui/icons-material/PersonAdd";
 import backendRequest from "../utils/BackendRequest";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import Visibility from "@mui/icons-material/Visibility";
 
 export default function CreateUserForm() {
   const theme = useTheme();
@@ -28,6 +32,8 @@ export default function CreateUserForm() {
   const [userType, setUserType] = React.useState(0);
   const [createUserError, setCreateUserError] = React.useState("");
   const [createUserSuccess, setCreateUserSuccess] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showRepeatPassword, setShowRepeatPassword] = React.useState(false);
 
   return (
     <Box
@@ -110,6 +116,22 @@ export default function CreateUserForm() {
             label="Password"
             autoFocus={false}
             error={passwordError !== ""}
+            type={showPassword ? 'text' : 'password'}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label={
+                    showPassword ? 'hide the password' : 'display the password'
+                  }
+                  onClick={() => { setShowPassword((show) => !show) }}
+                  onMouseDown={(event) => event.preventDefault()}
+                  onMouseUp={(event) => event.preventDefault()}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            }
             onBlur={(event) => {
               setPassword(event.target.value);
               checkPassword(event.target.value, setPasswordError);
@@ -131,6 +153,22 @@ export default function CreateUserForm() {
             label="Retype Password"
             autoFocus={false}
             error={repeatPasswordError !== ""}
+            type={showRepeatPassword ? 'text' : 'password'}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label={
+                    showRepeatPassword ? 'hide the password' : 'display the password'
+                  }
+                  onClick={() => { setShowRepeatPassword((show) => !show) }}
+                  onMouseDown={(event) => event.preventDefault()}
+                  onMouseUp={(event) => event.preventDefault()}
+                  edge="end"
+                >
+                  {showRepeatPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            }
             onBlur={(event) => {
               setRepeatPassword(event.target.value);
               checkRepeatPassword(password, event.target.value, setRepeatPasswordError);
