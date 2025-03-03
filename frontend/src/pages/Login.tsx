@@ -126,12 +126,26 @@ export default function Login() {
           color: theme.palette.secondary.contrastText
         }}
           endIcon={<LoginIcon />}
-          onClick={() => {
+          onClick={async () => {
             if (emailError.length != 0 || passwordError.length != 0) {
               setLoginError("Please correct the email or password fields before logging in");
               return;
             }
-            loginOnClick(email, password, setLoginError);
+            try {
+              const tokenObj: { token: string } = await (await loginOnClick(email, password)).json();
+
+              document.cookie = `Access-Token=` + tokenObj.token + `; Max-Age=` + (55 * 60 * 24 * 7); // Cookie will expire 5 minutes before the token does
+            } catch (statusCode: any) {
+              switch (statusCode) {
+                case 401:
+                case 404:
+                  setLoginError("Invalid email address or password entered.");
+                  break;
+                default:
+                  setLoginError("An unexpected error occured. Please let the administrator know if the issue persists.");
+                  break;
+              }
+            }
           }}
         >
           <Typography textTransform={'capitalize'}>Login</Typography>
@@ -141,48 +155,17 @@ export default function Login() {
   )
 }
 
-async function loginOnClick(email: string, password: string, setLoginError: React.Dispatch<SetStateAction<string>>) {
-  // const response = await backendRequest({
-  //   email: email,
-  //   password: password,
-  // },
-  //   "POST",
-  //   "/login",
-  // )
-  // if (!response.ok) {
-  //   throw response.status
-  // }
-  const fetchToken = async () => {
-    try {
-      const response = await fetch(import.meta.env.VITE_BACKEND_URL + "/login", {
-        method: "POST",
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
-        headers: {
-          "Content-type": "application/json; charset=UTF-8"
-        }
-      });
-      if (!response.ok) {
-        throw response.status
-      }
-
-      const jsonResponse: { token: string } = await response.json()
-
-      console.log(jsonResponse);
-    } catch (errStatus: any) {
-      switch (errStatus) {
-        case 401:
-        case 404:
-          setLoginError("Invalid email address or password entered.");
-          break;
-        default:
-          setLoginError("An unexpected error occured. Please let the administrator know if the issue persists.");
-          break;
-      }
-    }
+async function loginOnClick(email: string, password: string) {
+  const response = await backendRequest({
+    email: email,
+    password: password,
+  },
+    "POST",
+    "/login",
+  )
+  if (!response.ok) {
+    throw response.status
   }
 
-  fetchToken();
+  return response;
 }
