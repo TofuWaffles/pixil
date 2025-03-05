@@ -219,14 +219,15 @@ export default function CreateUserForm() {
               return;
             }
             try {
-              const response = await backendRequest({
+              const response = await backendRequest(JSON.stringify({
                 email: email,
                 username: username,
                 password: password,
                 userType: userType,
-              },
+              }),
                 "POST",
                 "/user",
+                true,
               )
               if (response.ok) {
                 setCreateUserSuccess("The new user has been created!");

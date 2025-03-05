@@ -1,5 +1,6 @@
 import { Button, styled } from "@mui/material";
 import CloudUploadIcon from '@mui/icons-material/Upload';
+import backendRequest from "../utils/BackendRequest";
 
 
 const VisuallyHiddenInput = styled('input')({
@@ -27,7 +28,7 @@ export default function UploadButton() {
       Upload
       <VisuallyHiddenInput
         type="file"
-        onChange={(event) => {
+        onChange={async (event) => {
           if (event.target == null) {
             return;
           }
@@ -35,16 +36,12 @@ export default function UploadButton() {
           data.append('file', event.target.files![0])
           data.append('name', 'User media')
           data.append('desc', 'A piece of media uploaded by the user')
-          fetch(import.meta.env.VITE_BACKEND_URL + "/media", {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-            },
-            body: data
-          }).then((response) => {
-            console.log(event.target.files![0]);
-            console.log(response)
-          })
+          try {
+            await backendRequest(data, "POST", "/media", true);
+          } catch (statusCode: any) {
+            console.log(statusCode);
+
+          }
         }}
         multiple
       />

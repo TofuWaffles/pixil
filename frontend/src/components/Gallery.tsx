@@ -3,6 +3,7 @@ import { Thumbnail } from "../types/props";
 import ThumbnailGroup from "./ThumbnailGroup";
 import ListItem from "@mui/material/ListItem";
 import List from "@mui/material/List";
+import backendRequest from "../utils/BackendRequest";
 
 
 export default function Gallery() {
@@ -13,7 +14,7 @@ export default function Gallery() {
   React.useEffect(() => {
     const fetchImages = async () => {
       try {
-        const response = await fetch(import.meta.env.VITE_BACKEND_URL + "/media?status=0");
+        const response = await backendRequest(null, "GET", "/media?status=0", true);
         if (!response.ok) {
           throw new Error(`Error fetching image IDs: ${response.statusText}`);
         }
@@ -22,7 +23,7 @@ export default function Gallery() {
         const media = mediaList.map((item: { id: number, createdAt: string }) => { return { id: item.id, createdAt: new Date(item.createdAt) } });
 
         const imagePromises = media.map(async (m: Thumbnail) => {
-          const imageResponse = await fetch(import.meta.env.VITE_BACKEND_URL + `/thumbnail?id=${m.id}`);
+          const imageResponse = await backendRequest(null, "GET", `/thumbnail?id=${m.id}`, true);
           if (!imageResponse.ok) {
             throw new Error(`Error fetching image with ID ${m.id}: ${imageResponse.statusText}`);
           }

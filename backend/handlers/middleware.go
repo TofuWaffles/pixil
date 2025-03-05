@@ -23,6 +23,11 @@ func (e Env) BasicChain(f http.HandlerFunc) http.HandlerFunc {
 	return e.Chain(f, e.AllowCORS("http://localhost:3000"), e.Logging(), e.Timeout(timeout))
 }
 
+// User authentication on top of the basic chain.
+func (e Env) BasicAuthChain(f http.HandlerFunc) http.HandlerFunc {
+	return e.Chain(f, e.Authenticate(), e.BasicChain)
+}
+
 // Logs access and execution time of a handler.
 func (e Env) Logging() Middleware {
 	return func(f http.HandlerFunc) http.HandlerFunc {

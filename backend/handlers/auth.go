@@ -182,3 +182,36 @@ func (e Env) Login(w http.ResponseWriter, r *http.Request) {
 		Token string `json:"token"`
 	}{Token: token})
 }
+
+func (e Env) Authenticate() Middleware {
+	return func(f http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			parts := strings.Fields(r.Header.Get("Authorization"))
+			if len(parts) < 2 || parts[0] != "Bearer" {
+				http.Error(w, "Invalid Authorization header", http.StatusUnauthorized)
+				return
+			}
+			tokenString := parts[1]
+			token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+				return []byte(os.Getenv("JWT_KEY")), nil
+			})
+			if err != nil {
+				http.Error(w, "Invalid token", http.StatusUnauthorized)
+				return
+			}
+			claims := token.Claims.(jwt.MapClaims)
+			exp, err := claims.GetExpirationTime()
+			if err != nil {
+				http.Error(w, "Invalid token", http.StatusUnauthorized)
+				e.Logger.Info("Auth token is missing expiry time", "token", token)
+				return
+			}
+			if time.Now().Compare(exp.Time) == 1 {
+				http.Error(w, "Token has expired", http.StatusUnauthorized)
+				return
+			}
+
+			f(w, r)
+		}
+	}
+}

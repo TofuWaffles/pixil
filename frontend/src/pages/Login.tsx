@@ -8,7 +8,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import useTheme from "@mui/material/styles/useTheme";
-import React, { SetStateAction } from "react";
+import React from "react";
 import validateEmail from "../utils/ValidateEmail";
 import LoginIcon from '@mui/icons-material/Login';
 import backendRequest from "../utils/BackendRequest";
@@ -155,12 +155,13 @@ export default function Login() {
 }
 
 async function loginOnClick(email: string, password: string) {
-  const response = await backendRequest({
+  const response = await backendRequest(JSON.stringify({
     email: email,
     password: password,
-  },
+  }),
     "POST",
     "/login",
+    false
   )
   if (!response.ok) {
     throw response.status

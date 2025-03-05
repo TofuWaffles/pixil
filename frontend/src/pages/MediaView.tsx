@@ -4,6 +4,7 @@ import IconButton from "@mui/material/IconButton";
 import React from "react";
 import ReactPlayer from "react-player";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import backendRequest from "../utils/BackendRequest";
 
 export default function MediaView() {
   const [idParam, _] = useSearchParams();
@@ -15,7 +16,7 @@ export default function MediaView() {
     const mediaID = idParam.get("id")
     const fetchImage = async () => {
       try {
-        const imageResponse = await fetch(import.meta.env.VITE_BACKEND_URL + `/media?id=${mediaID}`);
+        const imageResponse = await backendRequest(null, "GET", `/media?id=${mediaID}`, true);
         if (!imageResponse.ok) {
           throw new Error(`Error fetching image with ID ${mediaID}: ${imageResponse.statusText}`);
         }
