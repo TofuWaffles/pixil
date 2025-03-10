@@ -74,23 +74,16 @@ function UserSettings() {
   const [userSettingsError, setUserSettingsError] = React.useState("");
 
   React.useEffect(() => {
-    console.log("Running use effect...");
-
     const fetchUsers = async () => {
       try {
-        console.log("Getting users...");
-        const usersResponse = await backendRequest(null, "GET", "/user")
+        const usersResponse = await backendRequest(null, "GET", "/user", true)
         if (!usersResponse.ok) {
           throw new Error(`Error fetching users: ${usersResponse.statusText}`);
         }
-
         const users: User[] = await usersResponse.json();
-        console.log("users: ", users);
 
         setUsers(users);
       } catch (err: any) {
-        console.log("Error getting users: ", err);
-
         setUserSettingsError(err);
       }
     }
