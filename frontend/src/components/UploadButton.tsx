@@ -38,6 +38,7 @@ export default function UploadButton() {
           data.append('desc', 'A piece of media uploaded by the user')
           try {
             await backendRequest(data, "POST", "/media", true);
+            window.location.reload();
           } catch (statusCode: any) {
             console.log(statusCode);
 

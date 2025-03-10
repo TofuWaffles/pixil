@@ -4,6 +4,7 @@ import ThumbnailGroup from "./ThumbnailGroup";
 import ListItem from "@mui/material/ListItem";
 import List from "@mui/material/List";
 import backendRequest from "../utils/BackendRequest";
+import PlusButton from "./PlusButton";
 
 
 export default function Gallery() {
@@ -79,12 +80,12 @@ export default function Gallery() {
     )
   })
   return (
-    <div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+    <div className="flex h-screen flex-col">
+      <div style={{ display: "flex-1", flexWrap: "wrap", gap: "10px" }}>
         <List sx={{ width: "100%" }}>
           {thumbnailGroupComponents}
         </List>
       </div>
-    </div>
+    </div >
   );
 }
