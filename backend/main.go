@@ -16,7 +16,7 @@ func main() {
 	dbpool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-		os.Exit(1)
+		return
 	}
 	defer dbpool.Close()
 
@@ -25,7 +25,12 @@ func main() {
 		Logger:   slog.Default(),
 	}
 
-	// TODO: Guard sensitive routes with auth middleware
+	err = env.CreateDefaultAdmin()
+	if err != nil {
+		env.Logger.Error("Unable to create the default admin account", "error", err)
+		return
+	}
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", env.Chain(env.BasicChain(handlers.Home), env.GetOnly()))
 	mux.HandleFunc("/thumbnail", env.BasicAuthChain(env.Thumbnail))

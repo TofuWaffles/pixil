@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -156,8 +157,6 @@ func (e Env) Login(w http.ResponseWriter, r *http.Request) {
 
 	if err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(loginUser.Password)); err != nil {
 		http.Error(w, "Wrong password provided.", http.StatusUnauthorized)
-		hash, _ := bcrypt.GenerateFromPassword([]byte(loginUser.Password), bcrypt.DefaultCost)
-		e.Logger.Error("Wrong password", "password", loginUser.Password, "error", err, "hash", hash)
 		return
 	}
 
@@ -214,4 +213,28 @@ func (e Env) Authenticate() Middleware {
 			f(w, r)
 		}
 	}
+}
+
+func (e Env) CreateDefaultAdmin() error {
+	users, err := models.GetAllUsers(context.Background(), e.Database)
+	if err != nil {
+		return err
+	}
+	for _, user := range users {
+		if user.UserType == models.Admin {
+			return nil
+		}
+	}
+	// WARNING: Change password to be user-defined to prevent vulnerabilities
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	newAdmin := models.User{
+		Email:        "admin@admin.com",
+		Username:     "Default Admin",
+		PasswordHash: string(passwordHash),
+		UserType:     models.Admin,
+	}
+	return models.AddUser(context.Background(), e.Database, newAdmin)
 }

@@ -12,6 +12,7 @@ import React from "react";
 import validateEmail from "../utils/ValidateEmail";
 import LoginIcon from '@mui/icons-material/Login';
 import backendRequest from "../utils/BackendRequest";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const theme = useTheme();
@@ -22,6 +23,7 @@ export default function Login() {
   const [passwordError, setPasswordError] = React.useState("");
   const [loginError, setLoginError] = React.useState("");
   const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const navigate = useNavigate();
 
   return (
     <Box
@@ -134,6 +136,8 @@ export default function Login() {
               const tokenObj: { token: string } = await (await loginOnClick(email, password)).json();
 
               document.cookie = `Access-Token=` + tokenObj.token + `; Max-Age=` + (55 * 60 * 24 * 7); // Cookie will expire 5 minutes before the token does
+
+              navigate("/");
             } catch (statusCode: any) {
               switch (statusCode) {
                 case 401:
