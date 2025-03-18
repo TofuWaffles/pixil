@@ -290,3 +290,10 @@ func (e Env) DownloadTest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (e Env) classify_media(filename string) {
+	req, err := http.NewRequest("GET", "localhost:5000", nil)
+	if err != nil {
+
+	}
+}
