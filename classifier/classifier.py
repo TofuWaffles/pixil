@@ -20,6 +20,7 @@ class ClassificationHandler(BaseHTTPRequestHandler):
         for r in results:
             for t in r.summary():
                 labels.add(t["name"])
+        print(labels)
 
 
 def run(server_class=HTTPServer,
