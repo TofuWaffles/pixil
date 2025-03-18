@@ -95,13 +95,13 @@ func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			http.Error(w, genericErrMsg, http.StatusInternalServerError)
-			e.Logger.Error("Error trying to generate thumbnail", "error", err.Error())
+			e.Logger.Error("Error trying to generate thumbnail", "error", err.Error(), "filename", media.FileName)
 		}
 
 		err = jpeg.Encode(&buf, img, &jpeg.Options{Quality: 50})
 		if err != nil {
 			http.Error(w, genericErrMsg, http.StatusInternalServerError)
-			e.Logger.Error("Error trying to encode the thumbnail", "error", err.Error())
+			e.Logger.Error("Error trying to encode the thumbnail", "error", err.Error(), "filename", media.FileName)
 			return
 		}
 	} else if filepath.Ext(media.FileName) == ".mp4" {
@@ -110,7 +110,7 @@ func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		err := cmd.Run()
 		if err != nil {
 			http.Error(w, genericErrMsg, http.StatusInternalServerError)
-			e.Logger.Error("Error trying to generate thumbnail from video", "error", err.Error())
+			e.Logger.Error("Error trying to generate thumbnail from video", "error", err.Error(), "filename", media.FileName)
 		}
 	}
 

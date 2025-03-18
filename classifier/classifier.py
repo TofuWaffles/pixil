@@ -1,6 +1,7 @@
 from ultralytics import YOLO
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
+import json
 import logging
 
 
@@ -12,20 +13,23 @@ class ClassificationHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         url = urlparse(self.path)
-        query_params = parse_qs(url)
+        query_params = parse_qs(url.query)
         logging.info("Classifing image: ", query_params)
         self._set_response()
-        results = model(query_params.get("path"))
+        results = model("/pixil-media/" + str(query_params.get("path")))
         labels = set()
         for r in results:
             for t in r.summary():
                 labels.add(t["name"])
-        print(labels)
+        response_data = {"labels": list(labels)}
+        response_json = json.dumps(response_data)
+
+        self.wfile.write(response_json.encode("utf-8"))
 
 
 def run(server_class=HTTPServer,
         handler_class=ClassificationHandler,
-        port=8080):
+        port=5000):
     logging.basicConfig(level=logging.INFO)
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)

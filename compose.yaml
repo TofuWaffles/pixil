@@ -55,6 +55,7 @@ services:
       - type: bind
         target: /pixil-media/
         source: /usr/local/pixil/
+        read_only: true
 
   postgres:
     container_name: postgres
