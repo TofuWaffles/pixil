@@ -2,14 +2,13 @@ package handlers
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"image/jpeg"
 	"io"
 	"log/slog"
-	"mime/multipart"
 	"net/http"
-	"net/textproto"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -218,7 +217,11 @@ func (e Env) UploadMedia(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	fileName := filepath.Clean(header.Filename)
+	var sb strings.Builder
+	sb.WriteString(strconv.FormatInt(time.Now().Unix(), 10))
+	sb.WriteString("_")
+	sb.WriteString(filepath.Clean(header.Filename))
+	fileName := sb.String()
 	path := filepath.Join(dir, filepath.Base(fileName))
 	dst, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
@@ -237,63 +240,51 @@ func (e Env) UploadMedia(w http.ResponseWriter, r *http.Request) {
 		Status:     models.Active,
 	}
 
-	err = models.AddMedia(r.Context(), e.Database, media)
+	id, err := models.AddMedia(r.Context(), e.Database, media)
 	if err != nil {
 		panic(err)
 	}
 
+	go e.ClassifyMedia(id)
+
 	return
 }
 
-func (e Env) DownloadTest(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "OPTIONS" {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	mw := multipart.NewWriter(w)
-	w.Header().Set("Content-Type", mw.FormDataContentType())
-
-	path := "/pixil-media/"
-	entries, err := os.ReadDir(path)
+func (e Env) ClassifyMedia(mediaID int) {
+	fmt.Printf("Classifying: %d", mediaID)
+	media, err := models.GetMedia(context.Background(), e.Database, mediaID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		e.Logger.Error("Unable to get media from ID", "error", err)
 	}
-
-	for _, entry := range entries {
-		var filePath strings.Builder
-		filePath.WriteString(path)
-		filename := entry.Name()
-		filePath.WriteString(filename)
-		fileBytes, err := os.ReadFile(filePath.String())
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		contentType := http.DetectContentType(fileBytes)
-
-		partHeader := textproto.MIMEHeader{}
-		partHeader.Set("Content-Disposition", fmt.Sprintf(`form-data; name="file"; filename="%s"`, entry.Name()))
-		partHeader.Set("Content-Type", contentType)
-		fw, err := mw.CreatePart(partHeader)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if _, err := fw.Write(fileBytes); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	}
-	if err := mw.Close(); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
-func (e Env) classify_media(filename string) {
-	req, err := http.NewRequest("GET", "localhost:5000", nil)
+	filename := media.FileName
+	// TODO: Change these hard-coded URLs
+	req, err := http.NewRequest("GET", "http://127.0.0.1:5000", nil)
 	if err != nil {
+		e.Logger.Error("Unable to create the http request for media classification", "error", err)
+		return
+	}
+	q := req.URL.Query()
+	q.Add("filename", filename)
+	req.URL.RawQuery = q.Encode()
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
 
+	client := http.Client{
+		Timeout: 60 * time.Second,
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		e.Logger.Error("Unable to classify media", "error", err, "filename", filename)
+		return
+	}
+	defer res.Body.Close()
+	var labels struct {
+		Labels []string
+	}
+	json.NewDecoder(res.Body).Decode(&labels)
+
+	for _, label := range labels.Labels {
+		fmt.Printf("Label: %s", label)
 	}
 }

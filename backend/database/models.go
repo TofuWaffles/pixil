@@ -123,14 +123,17 @@ func GetAllMedia(ctx context.Context, db *pgxpool.Pool, status int) ([]Media, er
 }
 
 // Inserts a new media into the database.
-func AddMedia(ctx context.Context, db *pgxpool.Pool, media Media) error {
-	_, err := db.Exec(ctx,
+func AddMedia(ctx context.Context, db *pgxpool.Pool, media Media) (int, error) {
+	var id int
+	err := db.QueryRow(ctx,
 		`INSERT INTO media (file_name, owner_email, file_type, status, created_at)
-		VALUES ($1, $2, $3, $4, NOW())`,
+		VALUES ($1, $2, $3, $4, NOW())
+    RETURNING id`,
 		media.FileName,
 		media.OwnerEmail,
 		media.FileType,
 		media.Status,
-	)
-	return err
+	).Scan(&id)
+
+	return id, err
 }
