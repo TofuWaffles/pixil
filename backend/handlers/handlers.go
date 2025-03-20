@@ -284,7 +284,10 @@ func (e Env) ClassifyMedia(mediaID int) {
 	}
 	json.NewDecoder(res.Body).Decode(&labels)
 
-	for _, label := range labels.Labels {
-		fmt.Printf("Label: %s", label)
+	for _, tag := range labels.Labels {
+		err := models.AddTag(context.Background(), e.Database, mediaID, tag)
+		if err != nil {
+			e.Logger.Error("Unable to write tag to the database", "error", err, "media_id", mediaID, "tag", tag)
+		}
 	}
 }

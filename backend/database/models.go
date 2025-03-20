@@ -137,3 +137,15 @@ func AddMedia(ctx context.Context, db *pgxpool.Pool, media Media) (int, error) {
 
 	return id, err
 }
+
+func AddTag(ctx context.Context, db *pgxpool.Pool, mediaId int, tag string) error {
+	_, err := db.Exec(ctx,
+		`INSERT INTO tag (media_id, name)
+		VALUES ($1, $2)
+		`,
+		mediaId,
+		tag,
+	)
+
+	return err
+}
