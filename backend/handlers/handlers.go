@@ -250,8 +250,11 @@ func (e Env) UploadMedia(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func (e Env) SearchMedia(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func (e Env) ClassifyMedia(mediaID int) {
-	fmt.Printf("Classifying: %d", mediaID)
 	media, err := models.GetMedia(context.Background(), e.Database, mediaID)
 	if err != nil {
 		e.Logger.Error("Unable to get media from ID", "error", err)
