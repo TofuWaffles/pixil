@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"image/jpeg"
 	"io"
 	"log/slog"
@@ -125,11 +124,15 @@ func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
 
 func (e Env) Media(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		if r.URL.Query().Get("id") == "" {
-			e.AllActiveMedia(w, r)
+		if r.URL.Query().Get("id") != "" {
+			e.GetMedia(w, r)
 			return
 		}
-		e.GetMedia(w, r)
+		if r.URL.Query().Get("tag") != "" {
+			e.SearchMedia(w, r)
+			return
+		}
+		e.AllActiveMedia(w, r)
 		return
 	}
 	if r.Method == "POST" {
@@ -251,7 +254,16 @@ func (e Env) UploadMedia(w http.ResponseWriter, r *http.Request) {
 }
 
 func (e Env) SearchMedia(w http.ResponseWriter, r *http.Request) {
+	tag := r.URL.Query().Get("tag")
+	mediaIds, err := models.GetTaggedMedia(r.Context(), e.Database, tag)
+	if err != nil {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to retrieve tagged media IDs from database", "error", err, "tag", tag)
+	}
 
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(mediaIds)
 }
 
 func (e Env) ClassifyMedia(mediaID int) {

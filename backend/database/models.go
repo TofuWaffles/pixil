@@ -149,3 +149,32 @@ func AddTag(ctx context.Context, db *pgxpool.Pool, mediaId int, tag string) erro
 
 	return err
 }
+
+func GetTaggedMedia(ctx context.Context, db *pgxpool.Pool, tag string) ([]int, error) {
+	var ids []int
+	rows, err := db.Query(ctx,
+		`SELECT media_id FROM tag
+		WHERE name = $1
+		`,
+		tag,
+	)
+	if err != nil {
+		return ids, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var id int
+		err := rows.Scan(&id)
+		if err != nil {
+			return []int{}, err
+		}
+		ids = append(ids, id)
+	}
+
+	if err := rows.Err(); err != nil {
+		return []int{}, err
+	}
+
+	return ids, nil
+}
