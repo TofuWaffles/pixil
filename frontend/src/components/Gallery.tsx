@@ -4,10 +4,9 @@ import ThumbnailGroup from "./ThumbnailGroup";
 import ListItem from "@mui/material/ListItem";
 import List from "@mui/material/List";
 import backendRequest from "../utils/BackendRequest";
-import PlusButton from "./PlusButton";
 
 
-export default function Gallery() {
+export default function Gallery({ searchTerm }: { searchTerm: string | null }) {
   const [thumbnails, setThumbnails] = React.useState<{ id: number; createdAt: Date; src: string }[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -15,7 +14,12 @@ export default function Gallery() {
   React.useEffect(() => {
     const fetchImages = async () => {
       try {
-        const response = await backendRequest(null, "GET", "/media?status=0", true);
+        let requestPath = "/media?status=0";
+        if (searchTerm != null) {
+          requestPath += "&tag="
+          requestPath += searchTerm
+        }
+        const response = await backendRequest(null, "GET", requestPath, true);
         if (!response.ok) {
           throw new Error(`Error fetching image IDs: ${response.statusText}`);
         }

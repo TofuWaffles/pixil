@@ -19,6 +19,7 @@ import ListItemText from '@mui/material/ListItemText';
 import HomeIcon from '@mui/icons-material/Home';
 import UploadButton from './UploadButton';
 import Logo from './Logo';
+import SearchIcon from '@mui/icons-material/Search';
 
 // TODO: Adjust width to fit smaller devices
 const drawerWidth = 240;
@@ -211,6 +212,7 @@ export default function MainDrawer() {
         <Divider />
         <List>
           <DrawerItem name={'Home'} icon={<HomeIcon></HomeIcon>} open={open}></DrawerItem>
+          <DrawerItem name={'Search'} icon={<SearchIcon></SearchIcon>} open={open}></DrawerItem>
         </List>
       </Drawer>
     </Box>

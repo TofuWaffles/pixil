@@ -6,6 +6,7 @@ import MediaView from "./pages/MediaView";
 import Login from "./pages/Login";
 import AdminPanel from "./pages/AdminPanel";
 import { AdminRoute, MemberRoute } from "./components/ProtectedRoute";
+import { SearchPage } from "./pages/SearchPage";
 
 export default function AppRoutes() {
   return (
@@ -14,6 +15,7 @@ export default function AppRoutes() {
         <Route element={<MemberRoute />}>
           <Route path="/" element={<MainLayout />}>
             <Route path="" element={<Home />} />
+            <Route path="search" element={<SearchPage />} />
           </Route>
           <Route path="/media" element={<MediaView />} />
           <Route path="/settings" element={<Settings />} />

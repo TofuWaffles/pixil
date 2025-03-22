@@ -261,9 +261,20 @@ func (e Env) SearchMedia(w http.ResponseWriter, r *http.Request) {
 		e.Logger.Error("Unable to retrieve tagged media IDs from database", "error", err, "tag", tag)
 	}
 
+	mediaList := []models.Media{}
+	for _, id := range mediaIds {
+		media, err := models.GetMedia(r.Context(), e.Database, id)
+		if err != nil {
+			http.Error(w, genericErrMsg, http.StatusInternalServerError)
+			e.Logger.Error("Unable to retrieve tagged media of a specific ID", "error", err, "id", id)
+			return
+		}
+		mediaList = append(mediaList, media)
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(mediaIds)
+	json.NewEncoder(w).Encode(mediaList)
 }
 
 func (e Env) ClassifyMedia(mediaID int) {

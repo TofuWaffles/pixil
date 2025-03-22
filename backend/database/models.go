@@ -108,14 +108,14 @@ func GetAllMedia(ctx context.Context, db *pgxpool.Pool, status int) ([]Media, er
 	if status >= 0 {
 		rows, _ = db.Query(ctx,
 			`SELECT id, file_name, owner_email, file_type, status, created_at
-		FROM media
-		WHERE status = $1`,
+			FROM media
+			WHERE status = $1`,
 			status,
 		)
 	} else {
 		rows, _ = db.Query(ctx,
 			`SELECT id, file_name, owner_email, file_type, status, created_at
-		FROM media`,
+			FROM media`,
 		)
 	}
 

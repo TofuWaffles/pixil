@@ -4,7 +4,7 @@ import Gallery from "../components/Gallery";
 export function Home() {
   return (
     <Box>
-      <Gallery></Gallery>
+      <Gallery setSearchTerm={null}></Gallery>
     </Box>
   )
 }
