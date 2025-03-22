@@ -6,7 +6,7 @@ import List from "@mui/material/List";
 import backendRequest from "../utils/BackendRequest";
 
 
-export default function Gallery({ searchTerm }: { searchTerm: string | null }) {
+export default function Gallery({ searchQuery }: { searchQuery: string | null }) {
   const [thumbnails, setThumbnails] = React.useState<{ id: number; createdAt: Date; src: string }[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -15,9 +15,9 @@ export default function Gallery({ searchTerm }: { searchTerm: string | null }) {
     const fetchImages = async () => {
       try {
         let requestPath = "/media?status=0";
-        if (searchTerm != null) {
+        if (searchQuery != null) {
           requestPath += "&tag="
-          requestPath += searchTerm
+          requestPath += searchQuery
         }
         const response = await backendRequest(null, "GET", requestPath, true);
         if (!response.ok) {
@@ -49,7 +49,7 @@ export default function Gallery({ searchTerm }: { searchTerm: string | null }) {
     }
 
     fetchImages();
-  }, []);
+  }, [searchQuery]);
 
   // TODO: Make a prettier loading and error screen
   if (loading) return <div>Loading...</div>;

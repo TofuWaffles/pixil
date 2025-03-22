@@ -1,12 +1,14 @@
 import React from "react";
 import Box from "@mui/material/Box/Box";
 import Gallery from "../components/Gallery";
+import SearchBar from "../components/SearchBar";
 
 export function SearchPage() {
-  const [searchTerm, setSearchTerm] = React.useState("");
+  const [searchQuery, setSearchQuery] = React.useState("");
   return (
     <Box>
-      <Gallery></Gallery>
+      <SearchBar setSearchQuery={setSearchQuery} />
+      <Gallery searchQuery={searchQuery}></Gallery>
     </Box>
   )
 }

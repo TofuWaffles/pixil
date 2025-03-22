@@ -20,6 +20,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import UploadButton from './UploadButton';
 import Logo from './Logo';
 import SearchIcon from '@mui/icons-material/Search';
+import { useNavigate } from 'react-router-dom';
 
 // TODO: Adjust width to fit smaller devices
 const drawerWidth = 240;
@@ -109,8 +110,17 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-// TODO: Maybe combine these props into one interface
-function DrawerItem({ name, icon, open }: { name: string, icon: React.ReactElement, open: boolean }) {
+function DrawerItem({
+  name,
+  icon,
+  open,
+  onClick
+}: {
+  name: string,
+  icon: React.ReactElement,
+  open: boolean,
+  onClick: React.MouseEventHandler<HTMLDivElement> | undefined
+}) {
   return (
     <ListItem key={name} disablePadding sx={{ display: 'block' }}>
       <ListItemButton
@@ -127,6 +137,7 @@ function DrawerItem({ name, icon, open }: { name: string, icon: React.ReactEleme
               justifyContent: 'center',
             },
         ]}
+        onClick={onClick}
       >
         <ListItemIcon
           sx={[
@@ -165,6 +176,7 @@ function DrawerItem({ name, icon, open }: { name: string, icon: React.ReactEleme
 export default function MainDrawer() {
   let theme = useTheme();
   theme = responsiveFontSizes(theme);
+  const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
 
   const handleDrawerOpen = () => {
@@ -211,8 +223,18 @@ export default function MainDrawer() {
         </DrawerHeader>
         <Divider />
         <List>
-          <DrawerItem name={'Home'} icon={<HomeIcon></HomeIcon>} open={open}></DrawerItem>
-          <DrawerItem name={'Search'} icon={<SearchIcon></SearchIcon>} open={open}></DrawerItem>
+          <DrawerItem
+            name={'Home'}
+            icon={<HomeIcon></HomeIcon>}
+            open={open}
+            onClick={() => { navigate("/") }}
+          />
+          <DrawerItem
+            name={'Search'}
+            icon={<SearchIcon></SearchIcon>}
+            open={open}
+            onClick={() => { navigate("/search") }}
+          />
         </List>
       </Drawer>
     </Box>
