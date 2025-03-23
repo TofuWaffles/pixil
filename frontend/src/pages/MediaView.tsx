@@ -6,6 +6,8 @@ import ReactPlayer from "react-player";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import backendRequest from "../utils/BackendRequest";
 
+
+// TODO: Fix image sizing issue
 export default function MediaView() {
   const [idParam, _] = useSearchParams();
   const [mediaUrl, setMediaUrl] = React.useState("");
@@ -16,7 +18,7 @@ export default function MediaView() {
     const mediaID = idParam.get("id")
     const fetchImage = async () => {
       try {
-        const imageResponse = await backendRequest(null, "GET", `/media?id=${mediaID}`, true);
+        const imageResponse = await backendRequest(null, "GET", `/media_content?id=${mediaID}`, true);
         if (!imageResponse.ok) {
           throw new Error(`Error fetching image with ID ${mediaID}: ${imageResponse.statusText}`);
         }

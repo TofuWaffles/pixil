@@ -125,7 +125,7 @@ func (e Env) Thumbnail(w http.ResponseWriter, r *http.Request) {
 func (e Env) Media(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		if r.URL.Query().Get("id") != "" {
-			e.GetMedia(w, r)
+			e.GetMediaDetails(w, r)
 			return
 		}
 		if r.URL.Query().Get("tag") != "" {
@@ -144,7 +144,7 @@ func (e Env) Media(w http.ResponseWriter, r *http.Request) {
 }
 
 // Get a media with the ID specified in the URL parameter.
-func (e Env) GetMedia(w http.ResponseWriter, r *http.Request) {
+func (e Env) GetMediaContent(w http.ResponseWriter, r *http.Request) {
 	id, err := utils.IdFromParam(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -277,8 +277,14 @@ func (e Env) SearchMedia(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(mediaList)
 }
 
-func (e Env) GetMediaTags(w http.ResponseWriter, r *http.Request) {
+func (e Env) GetMediaDetails(w http.ResponseWriter, r *http.Request) {
 	mediaId, err := strconv.Atoi(r.URL.Query().Get("id"))
+	details, err := models.GetMedia(r.Context(), e.Database, mediaId)
+	if err != nil {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to get details of a specific media", "error", err, "media_id", mediaId)
+		return
+	}
 	tags, err := models.GetMediaTags(r.Context(), e.Database, mediaId)
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
@@ -286,9 +292,27 @@ func (e Env) GetMediaTags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	media := struct {
+		Id         int       `json:"id"`
+		FileName   string    `json:"fileName"`
+		OwnerEmail string    `json:"ownerEmail"`
+		FileType   string    `json:"fileType"`
+		Status     int       `json:"status"`
+		CreatedAt  time.Time `json:"createdAt"`
+		Tags       []string  `json:"tags"`
+	}{
+		Id:         details.Id,
+		FileName:   details.FileName,
+		OwnerEmail: details.OwnerEmail,
+		FileType:   details.FileType,
+		Status:     details.Status,
+		CreatedAt:  details.CreatedAt,
+		Tags:       tags,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(tags)
+	json.NewEncoder(w).Encode(media)
 }
 
 func (e Env) ClassifyMedia(mediaID int) {
