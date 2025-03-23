@@ -5,6 +5,7 @@ import React from "react";
 import ReactPlayer from "react-player";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import backendRequest from "../utils/BackendRequest";
+import MediaDetails from "../components/MediaDetails";
 
 
 // TODO: Fix image sizing issue
@@ -13,9 +14,9 @@ export default function MediaView() {
   const [mediaUrl, setMediaUrl] = React.useState("");
   const [isVideo, setIsVideo] = React.useState(false);
   const nagivate = useNavigate();
+  const mediaID: number = +idParam.get("id")!;
 
   React.useEffect(() => {
-    const mediaID = idParam.get("id")
     const fetchImage = async () => {
       try {
         const imageResponse = await backendRequest(null, "GET", `/media_content?id=${mediaID}`, true);
@@ -44,10 +45,19 @@ export default function MediaView() {
       {
         (isVideo)
           ? <div className="h-screen w-screen flex flex-row justify-center items-center">
-            <ReactPlayer url={mediaUrl} controls={true} playing={true} />
+            <ReactPlayer
+              className="max-w-fit max-h-fit"
+              url={mediaUrl}
+              controls={true}
+              playing={true}
+            />
           </div>
           : <div className="h-screen w-screen flex flex-row justify-center items-center">
             <Box
+              sx={{
+                maxWidth: "100vh",
+                maxHeight: "100vh",
+              }}
               component="img"
               alt="User Image"
               src={mediaUrl}
@@ -55,6 +65,7 @@ export default function MediaView() {
             </Box>
           </div>
       }
+      <MediaDetails mediaID={mediaID} />
     </div>
   )
 }

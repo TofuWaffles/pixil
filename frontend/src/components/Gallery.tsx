@@ -4,6 +4,7 @@ import ThumbnailGroup from "./ThumbnailGroup";
 import ListItem from "@mui/material/ListItem";
 import List from "@mui/material/List";
 import backendRequest from "../utils/BackendRequest";
+import DateFormat from "../types/DateFormat";
 
 
 export default function Gallery({ searchQuery }: { searchQuery: string | null }) {
@@ -72,17 +73,13 @@ export default function Gallery({ searchQuery }: { searchQuery: string | null })
   new Map([...thumbnailGroups].sort((a, b) => { return b[0] - a[0] })).forEach((images, key) => {
     thumbnailGroupComponents.push(
       <ListItem key={key}>
-        <ThumbnailGroup title={images[0].createdAt.toLocaleString('en-US', {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })}
+        <ThumbnailGroup title={images[0].createdAt.toLocaleString('en-US', DateFormat)}
           thumbnails={images}
         />
       </ListItem>
     )
   })
+
   return (
     <div className="flex h-screen flex-col">
       <div style={{ display: "flex-1", flexWrap: "wrap", gap: "10px" }}>
