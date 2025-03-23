@@ -30,7 +30,7 @@ type Env struct {
 const genericErrMsg = "Something went wrong when trying serve the request"
 
 func Home(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello from Seallove!"))
+	w.Write([]byte("Hello from Pixil. This route is a test to check if the API is working, which it is. :)"))
 }
 
 // Gets all active media.
@@ -275,6 +275,20 @@ func (e Env) SearchMedia(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(mediaList)
+}
+
+func (e Env) GetMediaTags(w http.ResponseWriter, r *http.Request) {
+	mediaId, err := strconv.Atoi(r.URL.Query().Get("id"))
+	tags, err := models.GetMediaTags(r.Context(), e.Database, mediaId)
+	if err != nil {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to get tags of a specific media", "error", err, "media_id", mediaId)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(tags)
 }
 
 func (e Env) ClassifyMedia(mediaID int) {
