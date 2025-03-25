@@ -225,8 +225,9 @@ func (e Env) CreateDefaultAdmin() error {
 			return nil
 		}
 	}
-	// WARNING: Change password to be user-defined to prevent vulnerabilities
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
+
+	password := os.Getenv("ADMIN_PASSWORD")
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}

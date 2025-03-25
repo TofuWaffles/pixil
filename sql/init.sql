@@ -22,9 +22,9 @@ CREATE TABLE IF NOT EXISTS tag (
 CREATE TABLE IF NOT EXISTS album (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL
-)
+);
 
 CREATE TABLE IF NOT EXISTS album_media (
   album_id INT NOT NULL,
   media_id INT NOT NULL
-)
+);
