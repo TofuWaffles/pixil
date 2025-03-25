@@ -255,26 +255,15 @@ func (e Env) UploadMedia(w http.ResponseWriter, r *http.Request) {
 
 func (e Env) SearchMedia(w http.ResponseWriter, r *http.Request) {
 	tag := r.URL.Query().Get("tag")
-	mediaIds, err := models.GetTaggedMedia(r.Context(), e.Database, tag)
+	media, err := models.GetTaggedMedia(r.Context(), e.Database, tag)
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
 		e.Logger.Error("Unable to retrieve tagged media IDs from database", "error", err, "tag", tag)
 	}
 
-	mediaList := []models.Media{}
-	for _, id := range mediaIds {
-		media, err := models.GetMedia(r.Context(), e.Database, id)
-		if err != nil {
-			http.Error(w, genericErrMsg, http.StatusInternalServerError)
-			e.Logger.Error("Unable to retrieve tagged media of a specific ID", "error", err, "id", id)
-			return
-		}
-		mediaList = append(mediaList, media)
-	}
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(mediaList)
+	json.NewEncoder(w).Encode(media)
 }
 
 func (e Env) GetMediaDetails(w http.ResponseWriter, r *http.Request) {

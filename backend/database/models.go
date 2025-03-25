@@ -44,6 +44,12 @@ type Tag struct {
 	Label   string `json:"label"`
 }
 
+// An user-created album that groups related media together.
+type Album struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
+
 // Retrieves a user from the database associated with a given email.
 func GetUser(ctx context.Context, db *pgxpool.Pool, email string) (User, error) {
 	rows, _ := db.Query(ctx,
@@ -150,33 +156,18 @@ func AddTag(ctx context.Context, db *pgxpool.Pool, mediaId int, tag string) erro
 	return err
 }
 
-func GetTaggedMedia(ctx context.Context, db *pgxpool.Pool, tag string) ([]int, error) {
-	ids := []int{}
-	rows, err := db.Query(ctx,
-		`SELECT media_id FROM tag
-		WHERE name = $1
+func GetTaggedMedia(ctx context.Context, db *pgxpool.Pool, tag string) ([]Media, error) {
+	rows, _ := db.Query(ctx,
+		`SELECT media.id, media.file_name, media.owner_email, media.file_type, media.status, media.created_at
+    FROM media
+    JOIN tag
+    ON media.id = tag.media_id
+		WHERE tag.name = $1
 		`,
 		tag,
 	)
-	if err != nil {
-		return ids, err
-	}
-	defer rows.Close()
 
-	for rows.Next() {
-		var id int
-		err := rows.Scan(&id)
-		if err != nil {
-			return []int{}, err
-		}
-		ids = append(ids, id)
-	}
-
-	if err := rows.Err(); err != nil {
-		return []int{}, err
-	}
-
-	return ids, nil
+	return pgx.CollectRows(rows, pgx.RowToStructByName[Media])
 }
 
 func GetMediaTags(ctx context.Context, db *pgxpool.Pool, mediaId int) ([]string, error) {
@@ -206,4 +197,68 @@ func GetMediaTags(ctx context.Context, db *pgxpool.Pool, mediaId int) ([]string,
 	}
 
 	return tags, nil
+}
+
+func AddAlbum(ctx context.Context, db *pgxpool.Pool, name string) error {
+	_, err := db.Exec(ctx,
+		`INSERT INTO album (name)
+		VALUES ($1)
+		`,
+		name,
+	)
+
+	return err
+}
+
+func GetAlbum(ctx context.Context, db *pgxpool.Pool, id int) (Album, error) {
+	rows, err := db.Query(ctx,
+		`SELECT id, name
+		FROM album
+		WHERE id = $1
+		LIMIT 1
+		`,
+		id,
+	)
+	if err != nil {
+		return Album{}, err
+	}
+
+	return pgx.CollectOneRow(rows, pgx.RowToStructByName[Album])
+}
+
+func AddAlbumMedia(ctx context.Context, db *pgxpool.Pool, albumId, mediaId int) error {
+	_, err := db.Exec(ctx,
+		`INSERT INTO album_media (album_id, media_id)
+    VALUES ($1)
+    `,
+		albumId,
+		mediaId,
+	)
+
+	return err
+}
+
+func GetAllAlbums(ctx context.Context, db *pgxpool.Pool) ([]Album, error) {
+	albums := []Album{}
+	rows, err := db.Query(ctx,
+		`SELECT (album_id, media_id) FROM album`,
+	)
+	if err != nil {
+		return albums, err
+	}
+
+	return pgx.CollectRows(rows, pgx.RowToStructByName[Album])
+}
+
+func GetAlbumMedia(ctx context.Context, db *pgxpool.Pool, albumId int) ([]Media, error) {
+	rows, _ := db.Query(ctx,
+		`SELECT media.id
+    FROM media
+    JOIN album_media ON media.id = album_media.media_id
+    WHERE album_media.album_id = $1
+		`,
+		albumId,
+	)
+
+	return pgx.CollectRows(rows, pgx.RowToStructByName[Media])
 }
