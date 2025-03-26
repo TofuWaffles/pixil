@@ -36,6 +36,8 @@ func main() {
 	mux.HandleFunc("/thumbnail", env.BasicAuthChain(env.Thumbnail))
 	mux.HandleFunc("/media", env.BasicAuthChain(env.Media))
 	mux.HandleFunc("/media_content", env.BasicAuthChain(env.GetMediaContent))
+	mux.HandleFunc("/albums", env.BasicAuthChain(env.Media))
+	mux.HandleFunc("/album_media", env.BasicAuthChain(env.AlbumMedia))
 	mux.HandleFunc("/user", env.BasicAuthChain(env.User))
 	mux.HandleFunc("/login", env.BasicChain(env.Login))
 
