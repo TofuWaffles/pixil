@@ -10,20 +10,11 @@ import Chip from "@mui/material/Chip";
 import DialogContent from "@mui/material/DialogContent";
 import Typography from "@mui/material/Typography";
 import DateFormat from "../types/DateFormat";
-
-interface Details {
-  id: number,
-  fileName: string,
-  ownerEmail: string,
-  fileType: string,
-  status: number,
-  createdAt: number,
-  tags: string[],
-}
+import { Media } from "../types/Models";
 
 export default function MediaDetails({ mediaID }: { mediaID: number }) {
   const [open, setOpen] = React.useState(false);
-  const [details, setDetails] = React.useState<Details>({
+  const [details, setDetails] = React.useState<Media>({
     id: -1,
     fileName: "None",
     ownerEmail: "None",
@@ -40,7 +31,7 @@ export default function MediaDetails({ mediaID }: { mediaID: number }) {
         if (!detailsResponse.ok) {
           throw new Error(`Error fetching details for media with ID ${mediaID}: ${detailsResponse.statusText}`);
         }
-        const details: Details = await detailsResponse.json();
+        const details: Media = await detailsResponse.json();
         setDetails(details);
       } catch (err: any) {
         console.log(err);

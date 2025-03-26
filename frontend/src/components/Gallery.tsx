@@ -1,5 +1,5 @@
 import React, { ReactElement } from "react";
-import { Thumbnail } from "../types/props";
+import { Thumbnail } from "../types/Models";
 import ThumbnailGroup from "./ThumbnailGroup";
 import ListItem from "@mui/material/ListItem";
 import List from "@mui/material/List";

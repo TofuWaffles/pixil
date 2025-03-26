@@ -1,38 +1,50 @@
-import React from "react"
+import React, { ReactElement } from "react"
+import backendRequest from "../utils/BackendRequest";
+import { Album, Media, Thumbnail } from "../types/Models";
+import ListItem from "@mui/material/ListItem";
+import ThumbnailBox from "../components/ThumbnailBox";
+import Grid2 from "@mui/material/Grid2";
 
 export default function AlbumsPage() {
-  const [albums, setAlbums] = React.useState([]);
+  const [error, setError] = React.useState("");
+  const [loading, setLoading] = React.useState(true);
+  let albumThumbnails: ReactElement[] = [];
 
   React.useEffect(() => {
     const fetchImages = async () => {
       try {
-        let requestPath = "/media?status=0";
-        if (searchQuery != null) {
-          requestPath += "&tag="
-          requestPath += searchQuery
-        }
-        const response = await backendRequest(null, "GET", requestPath, true);
+        const response = await backendRequest(null, "GET", "/albums", true);
         if (!response.ok) {
-          throw new Error(`Error fetching image IDs: ${response.statusText}`);
+          throw new Error(`Error albums: ${response.statusText}`);
         }
 
-        const mediaList = await response.json();
-        const media = mediaList.map((item: { id: number, createdAt: string }) => { return { id: item.id, createdAt: new Date(item.createdAt) } });
+        const albums: Album[] = await response.json();
 
-        const imagePromises = media.map(async (m: Thumbnail) => {
-          const imageResponse = await backendRequest(null, "GET", `/thumbnail?id=${m.id}`, true);
-          if (!imageResponse.ok) {
-            throw new Error(`Error fetching image with ID ${m.id}: ${imageResponse.statusText}`);
+        albums.forEach(async (album) => {
+          const response = await backendRequest(null, "GET", `/album_media?id=${album.id}`, true);
+          if (!response.ok) {
+            throw new Error(`Error fetching image IDs: ${response.statusText}`);
           }
+          const albumMedia: Media = await response.json();
 
+          const imageResponse = await backendRequest(null, "GET", `/thumbnail?id=${albumMedia.id}`, true);
+          if (!imageResponse.ok) {
+            throw new Error(`Error fetching image with ID ${albumMedia.id}: ${imageResponse.statusText} `);
+          }
           const imageBlob = await imageResponse.blob();
           const imageUrl = URL.createObjectURL(imageBlob);
-          return { id: m.id, createdAt: m.createdAt, src: imageUrl };
-        });
 
-        // Wait for all image fetches to complete
-        const thumbnails = await Promise.all(imagePromises);
-        setThumbnails(thumbnails);
+          const thumbnail: Thumbnail = {
+            id: albumMedia.id,
+            createdAt: new Date(albumMedia.createdAt * 1000),
+            src: imageUrl,
+          }
+          albumThumbnails.push(
+            <ListItem key={"album_thumbnail_" + album.id}>
+              <ThumbnailBox thumbnail={thumbnail} title={album.name} path={`/album?id=${album.id}`} />
+            </ListItem >
+          );
+        })
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -41,9 +53,16 @@ export default function AlbumsPage() {
     }
 
     fetchImages();
-  }, [searchQuery]);
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
-    
+    <div className="lg: size-9/12">
+      < Grid2 container direction="row" spacing={1}>
+        {albumThumbnails}
+      </Grid2 >
+    </div>
   )
 }

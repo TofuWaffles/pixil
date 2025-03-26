@@ -1,5 +1,5 @@
 import Grid2 from "@mui/material/Grid2";
-import { Thumbnail } from "../types/props";
+import { Thumbnail } from "../types/Models";
 import ThumbnailBox from "./ThumbnailBox";
 
 export default function ThumbnailGroup({ title, thumbnails }: {
@@ -9,7 +9,7 @@ export default function ThumbnailGroup({ title, thumbnails }: {
   let tboxes = thumbnails.map((value, key) => {
     return (
       <Grid2 key={key} className="size-fit">
-        <ThumbnailBox thumbnail={value} />
+        <ThumbnailBox thumbnail={value} title={""} path={""} />
       </Grid2>
     )
   })

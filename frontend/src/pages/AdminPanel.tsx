@@ -8,7 +8,7 @@ import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
 import React from "react";
-import { User } from "../types/props";
+import { User } from "../types/Models";
 import Grid2 from "@mui/material/Grid2";
 import Paper from "@mui/material/Paper";
 import TableContainer from "@mui/material/TableContainer";
