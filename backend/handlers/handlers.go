@@ -210,14 +210,18 @@ func (e Env) UploadMedia(w http.ResponseWriter, r *http.Request) {
 
 	file, header, err := r.FormFile("file")
 	if err != nil {
-		panic(err)
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to create new directory for media", "error", err)
+		return
 	}
 	defer file.Close()
 
 	dir := "/pixil-media/"
 	err = os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
-		panic(err)
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to create new directory for media", "error", err)
+		return
 	}
 
 	var sb strings.Builder
@@ -228,12 +232,16 @@ func (e Env) UploadMedia(w http.ResponseWriter, r *http.Request) {
 	path := filepath.Join(dir, filepath.Base(fileName))
 	dst, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
-		panic(err)
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to open file when uploading media", "error", err)
+		return
 	}
 	defer dst.Close()
 
 	if _, err := io.Copy(dst, file); err != nil {
-		panic(err)
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to copy file when uplaoding media", "error", err)
+		return
 	}
 
 	media := models.Media{
@@ -245,7 +253,9 @@ func (e Env) UploadMedia(w http.ResponseWriter, r *http.Request) {
 
 	id, err := models.AddMedia(r.Context(), e.Database, media)
 	if err != nil {
-		panic(err)
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to add media to the database", "error", err, "media", media)
+		return
 	}
 
 	go e.ClassifyMedia(id)
@@ -259,11 +269,104 @@ func (e Env) SearchMedia(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
 		e.Logger.Error("Unable to retrieve tagged media IDs from database", "error", err, "tag", tag)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(media)
+}
+
+func (e Env) Album(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		e.GetAllAlbums(w, r)
+		return
+	} else if r.Method == "POST" {
+		e.AddAlbum(w, r)
+		return
+	}
+
+	http.Error(w, "Bad request method.", http.StatusBadRequest)
+}
+
+func (e Env) GetAllAlbums(w http.ResponseWriter, r *http.Request) {
+	albums, err := models.GetAllAlbums(r.Context(), e.Database)
+	if err != nil {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to retrieve albums from the database", "error", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(albums)
+}
+
+func (e Env) AddAlbum(w http.ResponseWriter, r *http.Request) {
+	albumName := r.URL.Query().Get("name")
+	if albumName == "" {
+		http.Error(w, "Album name cannot be empty.", http.StatusBadRequest)
+		return
+	}
+	err := models.AddAlbum(r.Context(), e.Database, albumName)
+	if err != nil {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to add album to the database", "error", err, "album_name", albumName)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (e Env) AlbumMedia(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		e.GetAlbumMedia(w, r)
+	} else if r.Method == "POST" {
+		e.AddAlbumMedia(w, r)
+	}
+
+	http.Error(w, "Bad request method.", http.StatusBadRequest)
+}
+
+func (e Env) GetAlbumMedia(w http.ResponseWriter, r *http.Request) {
+	albumId, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to convert id string to int", "error", err, "album_id", albumId)
+		return
+	}
+	media, err := models.GetAlbumMedia(r.Context(), e.Database, albumId)
+	if err != nil {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to retrieve media from database based on media IDs", "error", err, "album_id", albumId)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(media)
+}
+
+func (e Env) AddAlbumMedia(w http.ResponseWriter, r *http.Request) {
+	albumId, err := strconv.Atoi(r.URL.Query().Get("album_id"))
+	if err != nil {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to convert id string to int", "error", err, "album_id", albumId)
+		return
+	}
+	mediaId, err := strconv.Atoi(r.URL.Query().Get("media_id"))
+	if err != nil {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to convert id string to int", "error", err, "media_id", mediaId)
+		return
+	}
+	err = models.AddAlbumMedia(r.Context(), e.Database, albumId, mediaId)
+	if err != nil {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to add album media to database", "error", err)
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func (e Env) GetMediaDetails(w http.ResponseWriter, r *http.Request) {
@@ -310,7 +413,7 @@ func (e Env) ClassifyMedia(mediaID int) {
 		e.Logger.Error("Unable to get media from ID", "error", err)
 	}
 	filename := media.FileName
-	// TODO: Change these hard-coded URLs
+
 	req, err := http.NewRequest("GET", "http://classifier:5000", nil)
 	if err != nil {
 		e.Logger.Error("Unable to create the http request for media classification", "error", err)
