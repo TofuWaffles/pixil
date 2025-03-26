@@ -21,8 +21,8 @@ import UploadButton from './UploadButton';
 import Logo from './Logo';
 import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
+import PhotoAlbum from '@mui/icons-material/PhotoAlbum';
 
-// TODO: Adjust width to fit smaller devices
 const drawerWidth = 240;
 
 const openedMixin = (theme: Theme): CSSObject => ({
@@ -225,19 +225,24 @@ export default function MainDrawer() {
         <List>
           <DrawerItem
             name={'Home'}
-            icon={<HomeIcon></HomeIcon>}
+            icon={<HomeIcon />}
             open={open}
             onClick={() => { navigate("/") }}
           />
           <DrawerItem
             name={'Search'}
-            icon={<SearchIcon></SearchIcon>}
+            icon={<SearchIcon />}
             open={open}
             onClick={() => { navigate("/search") }}
+          />
+          <DrawerItem
+            name={'Albums'}
+            icon={<PhotoAlbum />}
+            open={open}
+            onClick={() => { navigate("/albums") }}
           />
         </List>
       </Drawer>
     </Box>
   );
 }
-
