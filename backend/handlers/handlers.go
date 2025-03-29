@@ -132,6 +132,10 @@ func (e Env) Media(w http.ResponseWriter, r *http.Request) {
 			e.SearchMedia(w, r)
 			return
 		}
+		if r.URL.Query().Get("album") != "" {
+			e.GetAlbumMedia(w, r)
+			return
+		}
 		e.AllActiveMedia(w, r)
 		return
 	}

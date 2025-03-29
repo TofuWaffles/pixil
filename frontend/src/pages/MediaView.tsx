@@ -8,7 +8,6 @@ import backendRequest from "../utils/BackendRequest";
 import MediaDetails from "../components/MediaDetails";
 
 
-// TODO: Fix image sizing issue
 export default function MediaView() {
   const [idParam, _] = useSearchParams();
   const [mediaUrl, setMediaUrl] = React.useState("");
@@ -57,6 +56,7 @@ export default function MediaView() {
               sx={{
                 maxWidth: "100vh",
                 maxHeight: "100vh",
+                imageOrientation: "from-image"
               }}
               component="img"
               alt="User Image"

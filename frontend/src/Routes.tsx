@@ -8,6 +8,7 @@ import AdminPanel from "./pages/AdminPanel";
 import { AdminRoute, MemberRoute } from "./components/ProtectedRoute";
 import { SearchPage } from "./pages/SearchPage";
 import AlbumsPage from "./pages/AlbumsPage";
+import AlbumView from "./pages/AlbumView";
 
 export default function AppRoutes() {
   return (
@@ -18,6 +19,7 @@ export default function AppRoutes() {
             <Route path="" element={<Home />} />
             <Route path="search" element={<SearchPage />} />
             <Route path="albums" element={<AlbumsPage />} />
+            <Route path="album" element={<AlbumView />} />
           </Route>
           <Route path="/media" element={<MediaView />} />
           <Route path="/settings" element={<Settings />} />

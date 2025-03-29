@@ -7,7 +7,7 @@ import backendRequest from "../utils/BackendRequest";
 import DateFormat from "../types/DateFormat";
 
 
-export default function Gallery({ searchQuery }: { searchQuery: string | null }) {
+export default function Gallery({ queryParams }: { queryParams: string | null }) {
   const [thumbnails, setThumbnails] = React.useState<{ id: number; createdAt: Date; src: string }[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -16,9 +16,8 @@ export default function Gallery({ searchQuery }: { searchQuery: string | null })
     const fetchImages = async () => {
       try {
         let requestPath = "/media?status=0";
-        if (searchQuery != null) {
-          requestPath += "&tag="
-          requestPath += searchQuery
+        if (queryParams != null) {
+          requestPath += `&${queryParams}`
         }
         const response = await backendRequest(null, "GET", requestPath, true);
         if (!response.ok) {
@@ -50,7 +49,7 @@ export default function Gallery({ searchQuery }: { searchQuery: string | null })
     }
 
     fetchImages();
-  }, [searchQuery]);
+  }, [queryParams]);
 
   // TODO: Make a prettier loading and error screen
   if (loading) return <div>Loading...</div>;

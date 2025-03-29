@@ -8,7 +8,7 @@ export function SearchPage() {
   return (
     <Box>
       <SearchBar setSearchQuery={setSearchQuery} />
-      <Gallery searchQuery={searchQuery}></Gallery>
+      <Gallery queryParams={`tag=${searchQuery}`} />
     </Box>
   )
 }

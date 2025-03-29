@@ -25,6 +25,7 @@ export default function ThumbnailBox({
         alt="User Image"
         src={thumbnail.src}
         sx={{
+          imageOrientation: "from-image",
           "&:hover": {
             cursor: "pointer",
           },
