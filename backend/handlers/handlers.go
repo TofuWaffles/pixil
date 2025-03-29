@@ -333,7 +333,7 @@ func (e Env) AlbumMedia(w http.ResponseWriter, r *http.Request) {
 }
 
 func (e Env) GetAlbumMedia(w http.ResponseWriter, r *http.Request) {
-	albumId, err := utils.IdFromParam(r)
+	albumId, err := strconv.Atoi(r.URL.Query().Get("album"))
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
 		e.Logger.Error("Unable to retrieve ID from request parameter", "error", err)

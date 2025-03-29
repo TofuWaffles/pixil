@@ -28,7 +28,7 @@ export default function AlbumsPage() {
         const albums: Album[] = await response.json();
 
         albums.forEach(async (album) => {
-          const response = await backendRequest(null, "GET", `/album_media?id=${album.id}`, true);
+          const response = await backendRequest(null, "GET", `/media?album=${album.id}`, true);
           if (!response.ok) {
             throw new Error(`Error fetching image IDs: ${response.statusText}`);
           }
