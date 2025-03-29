@@ -241,7 +241,7 @@ func AddAlbumMedia(ctx context.Context, db *pgxpool.Pool, albumId, mediaId int) 
 func GetAllAlbums(ctx context.Context, db *pgxpool.Pool) ([]Album, error) {
 	albums := []Album{}
 	rows, err := db.Query(ctx,
-		`SELECT (id, name) FROM album`,
+		`SELECT id, name FROM album`,
 	)
 	if err != nil {
 		return albums, err

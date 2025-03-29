@@ -323,17 +323,16 @@ func (e Env) AlbumMedia(w http.ResponseWriter, r *http.Request) {
 		e.GetAlbumMedia(w, r)
 	} else if r.Method == "POST" {
 		e.AddAlbumMedia(w, r)
+	} else {
+		http.Error(w, "Bad request method.", http.StatusBadRequest)
 	}
-
-	http.Error(w, "Bad request method.", http.StatusBadRequest)
 }
 
 func (e Env) GetAlbumMedia(w http.ResponseWriter, r *http.Request) {
-	albumId, err := strconv.Atoi(r.URL.Query().Get("id"))
+	albumId, err := utils.IdFromParam(r)
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
-		e.Logger.Error("Unable to convert id string to int", "error", err, "album_id", albumId)
-		return
+		e.Logger.Error("Unable to retrieve ID from request parameter", "error", err)
 	}
 	media, err := models.GetAlbumMedia(r.Context(), e.Database, albumId)
 	if err != nil {
