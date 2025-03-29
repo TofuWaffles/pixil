@@ -15,7 +15,7 @@ import GrayBackground from "../assets/gray-background.png"
 export default function AlbumsPage() {
   const [error, setError] = React.useState("");
   const [loading, setLoading] = React.useState(true);
-  const [albumThumbnails, setAlbumThumbnails] = React.useState<ReactElement[]>([]);
+  const [albumThumbnails, setAlbumThumbnails] = React.useState<[Album, Thumbnail][]>([]);
 
   React.useEffect(() => {
     const fetchImages = async () => {
@@ -26,8 +26,6 @@ export default function AlbumsPage() {
         }
 
         const albums: Album[] = await response.json();
-
-        console.log("Albums: ", albums);
 
         albums.forEach(async (album) => {
           const response = await backendRequest(null, "GET", `/album_media?id=${album.id}`, true);
@@ -54,13 +52,8 @@ export default function AlbumsPage() {
             createdAt: createdAt,
             src: imageUrl,
           }
-          setAlbumThumbnails(oldList => [...oldList,
-          <ListItem key={"album_thumbnail_" + album.id}>
-            <ThumbnailBox thumbnail={thumbnail} title={album.name} path={`/album?id=${album.id}`} />
-          </ListItem >
-          ]
-          );
 
+          setAlbumThumbnails(oldList => [...oldList, [album, thumbnail]]);
         })
       } catch (err: any) {
         setError(err.message);
@@ -75,14 +68,25 @@ export default function AlbumsPage() {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  console.log(albumThumbnails);
+  console.log("Albums: ", albumThumbnails);
+
+  let thumbnailComponents: ReactElement[] = [];
+
+  albumThumbnails.forEach(([album, thumbnail]) => {
+    thumbnailComponents.push(
+      <ListItem key={"album_thumbnail_" + album.id}>
+        <ThumbnailBox thumbnail={thumbnail} title={album.name} path={`/album?id=${album.id}`} />
+      </ListItem >
+    )
+  })
+
   return (
     <Box>
       <AlbumPageHeader />
       <div className="lg: size-9/12">
         <Grid2 container direction="row" spacing={1}>
           <List>
-            {albumThumbnails}
+            {thumbnailComponents}
           </List>
         </Grid2 >
       </div>
