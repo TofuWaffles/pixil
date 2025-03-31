@@ -34,3 +34,8 @@ export interface AlbumMedia {
   albumId: number,
   mediaId: number,
 }
+
+export interface StorageStats {
+  capacity: number,
+  used: number,
+}

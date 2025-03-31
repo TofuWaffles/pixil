@@ -452,8 +452,8 @@ func (e Env) ClassifyMedia(mediaID int) {
 
 func (e Env) Storage(w http.ResponseWriter, r *http.Request) {
 	type Storage struct {
-		Capacity int
-		Used     int
+		Capacity int `json:"capacity"`
+		Used     int `json:"used"`
 	}
 
 	parts, err := disk.Partitions(false)
