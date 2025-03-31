@@ -21,12 +21,20 @@ export default function AddAlbumMediaButton({ mediaId }: { mediaId: number }) {
         }}>
         <LibraryAddIcon sx={{ width: 40, height: 40 }} />
       </IconButton >
-      <AddAlbumMediaDialog open={open} mediaId={mediaId} />
+      <AddAlbumMediaDialog mediaId={mediaId} open={open} setOpen={setOpen} />
     </Box>
   )
 }
 
-function AddAlbumMediaDialog({ open, mediaId }: { open: boolean, mediaId: number }) {
+function AddAlbumMediaDialog({
+  mediaId,
+  open,
+  setOpen
+}: {
+  mediaId: number,
+  open: boolean,
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) {
   const [albums, setAlbums] = React.useState<Album[]>([]);
   const [albumSelect, setAlbumSelect] = React.useState(1);
 
@@ -55,6 +63,9 @@ function AddAlbumMediaDialog({ open, mediaId }: { open: boolean, mediaId: number
   return (
     <Dialog
       open={open}
+      onClose={() => {
+        setOpen(false);
+      }}
     >
       <DialogTitle>
         Add this media to an album
