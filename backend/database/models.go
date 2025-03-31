@@ -50,6 +50,11 @@ type Album struct {
 	Name string `json:"name"`
 }
 
+type AlbumMedia struct {
+	AlbumId int `json:"albumId"`
+	MediaId int `json:"mediaId"`
+}
+
 // Retrieves a user from the database associated with a given email.
 func GetUser(ctx context.Context, db *pgxpool.Pool, email string) (User, error) {
 	rows, _ := db.Query(ctx,
@@ -229,7 +234,7 @@ func GetAlbum(ctx context.Context, db *pgxpool.Pool, id int) (Album, error) {
 func AddAlbumMedia(ctx context.Context, db *pgxpool.Pool, albumId, mediaId int) error {
 	_, err := db.Exec(ctx,
 		`INSERT INTO album_media (album_id, media_id)
-    VALUES ($1)
+    VALUES ($1, $2)
     `,
 		albumId,
 		mediaId,

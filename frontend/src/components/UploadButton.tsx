@@ -41,7 +41,6 @@ export default function UploadButton() {
             window.location.reload();
           } catch (statusCode: any) {
             console.log(statusCode);
-
           }
         }}
         multiple

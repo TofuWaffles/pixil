@@ -6,6 +6,7 @@ import ReactPlayer from "react-player";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import backendRequest from "../utils/BackendRequest";
 import MediaDetails from "../components/MediaDetails";
+import AddAlbumMediaButton from "../components/AddAlbumMediaButton";
 
 
 export default function MediaView() {
@@ -65,6 +66,7 @@ export default function MediaView() {
             </Box>
           </div>
       }
+      <AddAlbumMediaButton mediaId={mediaID} />
       <MediaDetails mediaID={mediaID} />
     </div>
   )

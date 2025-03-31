@@ -1,6 +1,6 @@
 import getCookie from "./GetCookie";
 
-export default async function backendRequest(data: string | FormData | null, method: string, path: string, privileged: boolean) {
+export default async function backendRequest(data: any, method: string, path: string, privileged: boolean) {
   let request: RequestInit = {
     method: method,
   }

@@ -351,22 +351,20 @@ func (e Env) GetAlbumMedia(w http.ResponseWriter, r *http.Request) {
 }
 
 func (e Env) AddAlbumMedia(w http.ResponseWriter, r *http.Request) {
-	albumId, err := strconv.Atoi(r.URL.Query().Get("album_id"))
+	var albumMedia models.AlbumMedia
+	defer r.Body.Close()
+	err := json.NewDecoder(r.Body).Decode(&albumMedia)
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
-		e.Logger.Error("Unable to convert id string to int", "error", err, "album_id", albumId)
+		e.Logger.Error("Unable to unmarshal the request body", "error", err, "album_media", albumMedia)
 		return
 	}
-	mediaId, err := strconv.Atoi(r.URL.Query().Get("media_id"))
-	if err != nil {
-		http.Error(w, genericErrMsg, http.StatusInternalServerError)
-		e.Logger.Error("Unable to convert id string to int", "error", err, "media_id", mediaId)
-		return
-	}
-	err = models.AddAlbumMedia(r.Context(), e.Database, albumId, mediaId)
+	e.Logger.Info("Album media post request", "album_media", albumMedia)
+	err = models.AddAlbumMedia(r.Context(), e.Database, albumMedia.AlbumId, albumMedia.MediaId)
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
 		e.Logger.Error("Unable to add album media to database", "error", err)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)

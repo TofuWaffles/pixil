@@ -29,3 +29,8 @@ export interface Album {
   id: number,
   name: string,
 }
+
+export interface AlbumMedia {
+  albumId: number,
+  mediaId: number,
+}
