@@ -257,7 +257,7 @@ func GetAllAlbums(ctx context.Context, db *pgxpool.Pool) ([]Album, error) {
 
 func GetAlbumMedia(ctx context.Context, db *pgxpool.Pool, albumId int) ([]Media, error) {
 	rows, _ := db.Query(ctx,
-		`SELECT media.id
+		`SELECT media.id, media.file_name, media.owner_email, media.file_type, media.status, media.created_at
     FROM media
     JOIN album_media ON media.id = album_media.media_id
     WHERE album_media.album_id = $1
