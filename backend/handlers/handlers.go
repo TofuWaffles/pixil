@@ -19,6 +19,7 @@ import (
 	"github.com/TofuWaffles/pixil/utils"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/shirou/gopsutil/v4/disk"
 )
 
 // Used to pass data that typically needs to be accessed by all handlers like database connections and loggers.
@@ -447,4 +448,39 @@ func (e Env) ClassifyMedia(mediaID int) {
 			e.Logger.Error("Unable to write tag to the database", "error", err, "media_id", mediaID, "tag", tag)
 		}
 	}
+}
+
+func (e Env) Storage(w http.ResponseWriter, r *http.Request) {
+	type Storage struct {
+		Capacity int
+		Used     int
+	}
+
+	parts, err := disk.Partitions(false)
+	if err != nil {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to get partitions from disk", "error", err)
+		return
+	}
+
+	if len(parts) < 1 {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to get storage capacity because no storage partitions were found on the device")
+		return
+	}
+
+	device := parts[0].Mountpoint
+	stats, err := disk.UsageWithContext(r.Context(), device)
+	if err != nil {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to get disk usage stats", "error", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(Storage{
+		Capacity: int(stats.Free),
+		Used:     int(stats.Used),
+	})
 }

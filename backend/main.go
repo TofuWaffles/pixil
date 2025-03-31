@@ -39,6 +39,7 @@ func main() {
 	mux.HandleFunc("/albums", env.BasicAuthChain(env.Album))
 	mux.HandleFunc("/album_media", env.BasicAuthChain(env.AlbumMedia))
 	mux.HandleFunc("/user", env.BasicAuthChain(env.User))
+	mux.HandleFunc("/storage", env.BasicAuthChain(env.Storage))
 	mux.HandleFunc("/login", env.BasicChain(env.Login))
 
 	log.Println("Starting server on :4000")
