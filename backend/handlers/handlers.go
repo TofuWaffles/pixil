@@ -409,6 +409,19 @@ func (e Env) GetMediaDetails(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(media)
 }
 
+func (e Env) Tags(w http.ResponseWriter, r *http.Request) {
+	tags, err := models.GetAllTags(r.Context(), e.Database)
+	if err != nil {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to get all unique tags from the database", "error", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(tags)
+}
+
 func (e Env) ClassifyMedia(mediaID int) {
 	media, err := models.GetMedia(context.Background(), e.Database, mediaID)
 	if err != nil {

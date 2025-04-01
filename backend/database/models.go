@@ -267,3 +267,30 @@ func GetAlbumMedia(ctx context.Context, db *pgxpool.Pool, albumId int) ([]Media,
 
 	return pgx.CollectRows(rows, pgx.RowToStructByName[Media])
 }
+
+func GetAllTags(ctx context.Context, db *pgxpool.Pool) ([]string, error) {
+	type UniqueTag struct {
+		Name string
+	}
+
+	rows, _ := db.Query(ctx,
+		`SELECT DISTINCT ON (name)
+    name
+    FROM tag
+    ORDER BY name
+  `,
+	)
+
+	var tags []string
+
+	for rows.Next() {
+		var uniqueTag UniqueTag
+		err := rows.Scan(&uniqueTag.Name)
+		if err != nil {
+			return []string{}, err
+		}
+		tags = append(tags, uniqueTag.Name)
+	}
+
+	return tags, nil
+}
