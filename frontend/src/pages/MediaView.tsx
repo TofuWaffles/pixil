@@ -7,6 +7,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import backendRequest from "../utils/BackendRequest";
 import MediaDetails from "../components/MediaDetails";
 import AddAlbumMediaButton from "../components/AddAlbumMediaButton";
+import MediaDeleteButton from "../components/MediaDeleteButton";
 
 
 export default function MediaView() {
@@ -67,6 +68,7 @@ export default function MediaView() {
           </div>
       }
       <AddAlbumMediaButton mediaId={mediaID} />
+      <MediaDeleteButton mediaId={mediaID} />
       <MediaDetails mediaID={mediaID} />
     </div>
   )
