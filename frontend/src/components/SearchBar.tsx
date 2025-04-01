@@ -4,8 +4,10 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
+import backendRequest from '../utils/BackendRequest';
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -24,6 +26,7 @@ const Search = styled('div')(({ theme }) => ({
 
 const SearchIconWrapper = styled('div')(({ theme }) => ({
   padding: theme.spacing(0, 2),
+  right: 0,
   height: '100%',
   position: 'absolute',
   pointerEvents: 'none',
@@ -32,24 +35,27 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
   justifyContent: 'center',
 }));
 
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: 'inherit',
-  width: '100%',
-  '& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
-    [theme.breakpoints.up('sm')]: {
-      width: '12ch',
-      '&:focus': {
-        width: '20ch',
-      },
-    },
+const StyledTextField = styled(TextField)(({ }) => ({
+  '& .MuiInputBase-root': {
+    color: 'inherit',
+    width: '20ch',
   },
 }));
 
 export default function SearchBar({ setSearchQuery }: { setSearchQuery: React.Dispatch<React.SetStateAction<string>> }) {
+  const [tags, setTags] = React.useState<string[]>([]);
+
+  React.useEffect(() => {
+    const fetchTags = async () => {
+      const response = await backendRequest(null, "GET", "/tags", true);
+      const tags: string[] = await response.json();
+
+      setTags(tags);
+    }
+
+    fetchTags();
+  }, []);
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar sx={{
@@ -68,19 +74,36 @@ export default function SearchBar({ setSearchQuery }: { setSearchQuery: React.Di
           >
             Search Images and Videos
           </Typography>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
-              autoFocus={true}
-              onChange={(event) => {
-                setSearchQuery(event.target.value)
-              }}
-            />
-          </Search>
+          <Autocomplete
+            freeSolo
+            id="tag-search-autocomplete"
+            disableClearable
+            options={tags}
+            onInputChange={(_, value) => {
+              setSearchQuery(value);
+            }}
+            renderInput={(params) => (
+              <Search>
+                <SearchIconWrapper>
+                  <SearchIcon />
+                </SearchIconWrapper>
+                <StyledTextField
+                  {...params}
+                  slotProps={{
+                    input: {
+                      ...params.InputProps,
+                      type: "search",
+                    }
+                  }}
+                  placeholder="Search…"
+                  autoFocus={true}
+                  onChange={(event) => {
+                    setSearchQuery(event.target.value)
+                  }}
+                />
+              </Search>
+            )}
+          />
         </Toolbar>
       </AppBar>
     </Box>

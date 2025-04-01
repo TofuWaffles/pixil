@@ -410,6 +410,9 @@ func (e Env) GetMediaDetails(w http.ResponseWriter, r *http.Request) {
 }
 
 func (e Env) Tags(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Only GET methods are supported on this path", http.StatusBadRequest)
+	}
 	tags, err := models.GetAllTags(r.Context(), e.Database)
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
