@@ -135,6 +135,9 @@ function CreateAlbumButton() {
           m: 1,
           color: "secondary.main",
         }}
+        InputLabelProps={{
+          color: "secondary"
+        }}
         error={error}
         id="album-name"
         label="Album Name"

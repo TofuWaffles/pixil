@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, LinearProgress, linearProgressClasses, styled, Typography } from "@mui/material";
+import { Box, Card, CardContent, Grid2, LinearProgress, linearProgressClasses, styled, Typography } from "@mui/material";
 import React from "react";
 import { StorageStats } from "../types/Models";
 import backendRequest from "../utils/BackendRequest";
@@ -43,7 +43,6 @@ export default function StorageInfo() {
       }}>
         <CardContent>
           <Typography gutterBottom variant="h4">Storage</Typography>
-          <BorderLinearProgress variant="determinate" value={storageStats.used / storageStats.capacity * 100} />
           <Typography
             variant="subtitle1"
             sx={{
@@ -52,16 +51,22 @@ export default function StorageInfo() {
           >
             {`Capacity: ${Math.round(storageStats.capacity / (10 ** 9))} GB`}
           </Typography>
-          <Typography
-            variant="subtitle1"
-          >
-            {`Used: ${Math.round(storageStats.used / (10 ** 9))} GB`}
-          </Typography>
-          <Typography
-            variant="subtitle1"
-          >
-            {`Free: ${Math.round((storageStats.capacity - storageStats.used) / (10 ** 9))} GB`}
-          </Typography>
+          <BorderLinearProgress variant="determinate" value={storageStats.used / storageStats.capacity * 100} />
+          <Grid2 container columns={2} direction="row">
+            <Typography
+              width="50%"
+              variant="subtitle1"
+            >
+              {`Used: ${Math.round(storageStats.used / (10 ** 9))} GB (${Math.round(storageStats.used / storageStats.capacity * 100)}%)`}
+            </Typography>
+            <Typography
+              width="50%"
+              align="right"
+              variant="subtitle1"
+            >
+              {`Free: ${Math.round((storageStats.capacity - storageStats.used) / (10 ** 9))} GB`}
+            </Typography>
+          </Grid2>
         </CardContent>
       </Card>
     </Box>
