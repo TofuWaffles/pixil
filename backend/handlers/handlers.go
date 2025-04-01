@@ -144,6 +144,10 @@ func (e Env) Media(w http.ResponseWriter, r *http.Request) {
 		e.UploadMedia(w, r)
 		return
 	}
+	if r.Method == "DELETE" {
+		e.ArchiveMedia(w, r)
+		return
+	}
 
 	http.Error(w, genericErrMsg, http.StatusBadRequest)
 }
@@ -407,6 +411,23 @@ func (e Env) GetMediaDetails(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(media)
+}
+
+func (e Env) ArchiveMedia(w http.ResponseWriter, r *http.Request) {
+	mediaId, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		http.Error(w, "This resource requires and id query paramter", http.StatusBadRequest)
+		return
+	}
+
+	err = models.ArchiveMedia(r.Context(), e.Database, mediaId)
+	if err != nil {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to set the media to archive in the database", "error", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func (e Env) Tags(w http.ResponseWriter, r *http.Request) {

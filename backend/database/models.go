@@ -101,7 +101,7 @@ func GetMedia(ctx context.Context, db *pgxpool.Pool, id int) (Media, error) {
 	rows, err := db.Query(ctx,
 		`SELECT id, file_name, owner_email, file_type, status, created_at
 		FROM media
-		WHERE id = $1
+		WHERE id = $1 AND status = 0
 		LIMIT 1
 		`,
 		id,
@@ -149,6 +149,18 @@ func AddMedia(ctx context.Context, db *pgxpool.Pool, media Media) (int, error) {
 	return id, err
 }
 
+func ArchiveMedia(ctx context.Context, db *pgxpool.Pool, mediaId int) error {
+	_, err := db.Exec(ctx,
+		`UPDATE media
+    SET status = 1
+    WHERE id = $1
+    `,
+		mediaId,
+	)
+
+	return err
+}
+
 func AddTag(ctx context.Context, db *pgxpool.Pool, mediaId int, tag string) error {
 	_, err := db.Exec(ctx,
 		`INSERT INTO tag (media_id, name)
@@ -167,7 +179,7 @@ func GetTaggedMedia(ctx context.Context, db *pgxpool.Pool, tag string) ([]Media,
     FROM media
     JOIN tag
     ON media.id = tag.media_id
-		WHERE tag.name = $1
+		WHERE tag.name = $1 AND media.status = 0
 		`,
 		tag,
 	)
@@ -260,7 +272,7 @@ func GetAlbumMedia(ctx context.Context, db *pgxpool.Pool, albumId int) ([]Media,
 		`SELECT media.id, media.file_name, media.owner_email, media.file_type, media.status, media.created_at
     FROM media
     JOIN album_media ON media.id = album_media.media_id
-    WHERE album_media.album_id = $1
+    WHERE album_media.album_id = $1 AND media.status = 0
 		`,
 		albumId,
 	)
