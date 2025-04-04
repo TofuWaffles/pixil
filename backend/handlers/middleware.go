@@ -35,7 +35,7 @@ func (e Env) Logging() Middleware {
 			start := time.Now()
 			e.Logger.Info("Serving", "path", r.URL.Path, "method", r.Method, "remote_addr", r.RemoteAddr, "started_at", start)
 			defer func() {
-				e.Logger.Info("Finished serving", "path", r.URL.Path, "remote_addr", r.RemoteAddr, "finished_in", time.Since(start))
+				e.Logger.Info("Finished serving", "path", r.URL.Path, "method", r.Method, "remote_addr", r.RemoteAddr, "finished_in", time.Since(start))
 			}()
 
 			f(w, r)
