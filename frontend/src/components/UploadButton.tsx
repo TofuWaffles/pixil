@@ -23,7 +23,10 @@ export default function UploadButton() {
       variant="contained"
       tabIndex={-1}
       startIcon={<CloudUploadIcon />}
-      sx={{ backgroundColor: "secondary.main" }}
+      sx={{
+        m: 1,
+        backgroundColor: "secondary.main",
+      }}
     >
       Upload
       <VisuallyHiddenInput

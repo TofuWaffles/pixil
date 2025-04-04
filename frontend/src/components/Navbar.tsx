@@ -25,7 +25,8 @@ import PhotoAlbum from '@mui/icons-material/PhotoAlbum';
 import parseJwt from '../utils/ParseJWT';
 import getCookie from '../utils/GetCookie';
 import { AccessTokenClaims } from '../types/Models';
-import { AdminPanelSettings } from '@mui/icons-material';
+import { AdminPanelSettings, Logout } from '@mui/icons-material';
+import removeCookie from '../utils/RemoveCookie';
 
 const drawerWidth = 240;
 
@@ -227,6 +228,17 @@ export default function MainDrawer() {
                 <AdminPanelSettings />
               </IconButton>
             }
+            <IconButton
+              sx={{
+                m: 1
+              }}
+              onClick={() => {
+                removeCookie("Access-Token");
+                window.location.href = "/login";
+              }}
+            >
+              <Logout />
+            </IconButton>
           </div>
         </Toolbar>
       </AppBar>
