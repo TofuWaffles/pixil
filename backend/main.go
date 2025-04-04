@@ -20,9 +20,17 @@ func main() {
 	}
 	defer dbpool.Close()
 
+	envLogLevel := slog.LevelInfo
+	if os.Getenv("LOG_LEVEL") == "DEBUG" {
+		envLogLevel = slog.LevelDebug
+	}
+	logLevel := new(slog.LevelVar)
+	logLevel.Set(envLogLevel)
 	env := handlers.Env{
 		Database: dbpool,
-		Logger:   slog.Default(),
+		Logger: slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+			Level: logLevel,
+		})),
 	}
 
 	err = env.CreateDefaultAdmin()
