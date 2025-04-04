@@ -22,6 +22,10 @@ import Logo from './Logo';
 import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
 import PhotoAlbum from '@mui/icons-material/PhotoAlbum';
+import parseJwt from '../utils/ParseJWT';
+import getCookie from '../utils/GetCookie';
+import { AccessTokenClaims } from '../types/Models';
+import { AdminPanelSettings } from '@mui/icons-material';
 
 const drawerWidth = 240;
 
@@ -178,6 +182,7 @@ export default function MainDrawer() {
   theme = responsiveFontSizes(theme);
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
+  const accessTokenClaims: AccessTokenClaims = parseJwt(getCookie("Access-Token")!);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -211,7 +216,17 @@ export default function MainDrawer() {
             Pixil
           </Typography>
           <div className='absolute right-5'>
-            <UploadButton></UploadButton>
+            <UploadButton />
+            {accessTokenClaims.userType == 1 &&
+              <IconButton
+                sx={{
+                  m: 1
+                }}
+                onClick={() => window.location.href = "/admin"}
+              >
+                <AdminPanelSettings />
+              </IconButton>
+            }
           </div>
         </Toolbar>
       </AppBar>

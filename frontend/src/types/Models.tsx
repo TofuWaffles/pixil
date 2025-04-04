@@ -39,3 +39,13 @@ export interface StorageStats {
   capacity: number,
   used: number,
 }
+
+export interface AccessTokenClaims {
+  email: string,
+  exp: number,
+  iat: number,
+  iss: string,
+  sub: string,
+  userType: number,
+  username: string,
+}
