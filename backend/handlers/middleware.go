@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -20,7 +21,8 @@ func (e Env) Chain(f http.HandlerFunc, middleware ...Middleware) http.HandlerFun
 // Basic chain providing middleware that should be used by most if not all handlers.
 func (e Env) BasicChain(f http.HandlerFunc) http.HandlerFunc {
 	timeout := time.Duration(60 * float64(time.Second))
-	return e.Chain(f, e.AllowCORS("http://localhost:3000"), e.Logging(), e.Timeout(timeout))
+	url := os.Getenv("FRONTEND_URL")
+	return e.Chain(f, e.AllowCORS(url), e.Logging(), e.Timeout(timeout))
 }
 
 // User authentication on top of the basic chain.
@@ -67,6 +69,7 @@ func (e Env) AllowCORS(allowedOrigin string) Middleware {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			origin := r.Header.Get("Origin")
+			e.Logger.Info("Checking CORS", "origin", origin, "allowed", allowedOrigin)
 			if origin == allowedOrigin {
 				w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
 				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")

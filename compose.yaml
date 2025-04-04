@@ -3,18 +3,37 @@ services:
     container_name: frontend
     build:
       context: ./frontend/
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     restart: always
     networks:
       - frontend
     ports:
-      - 3000:3000
+      - 80:3000
     environment:
       VITE_DOMAIN_URL: "${DOMAIN_URL}"
+      VITE_BACKEND_URL: "${DOMAIN_URL}:4000"
+    volumes:
+      - /app/node_modules
+      - ./frontend:/app
+    profiles: ["prod"]
+
+  frontend-dev:
+    container_name: frontend-dev
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile.dev
+    restart: always
+    networks:
+      - frontend-dev
+    ports:
+      - 3000:3000
+    environment:
+      VITE_DOMAIN_URL: "http://localhost"
       VITE_BACKEND_URL: "http://localhost:4000"
     volumes:
       - /app/node_modules
       - ./frontend:/app
+    profiles: ["dev"]
 
   backend:
     container_name: backend
@@ -26,6 +45,8 @@ services:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable"
       JWT_KEY: "${JWT_KEY}"
       ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
+      DOMAIN_URL: "${DOMAIN_URL}"
+      FRONTEND_URL: "${DOMAIN_URL}"
     networks:
       - frontend
       - backend
@@ -41,6 +62,36 @@ services:
       watch:
         - action: rebuild
           path: ./backend/
+    profiles: ["prod"]
+
+  backend-dev:
+    container_name: backend-dev
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable"
+      JWT_KEY: "${JWT_KEY}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
+      DOMAIN_URL: "http://localhost"
+      FRONTEND_URL: "http://localhost:3000"
+    networks:
+      - frontend-dev
+      - backend-dev
+    ports:
+      - 4000:4000
+    volumes:
+      - type: bind
+        target: /pixil-media/
+        source: /usr/local/pixil-dev/
+    depends_on:
+      - postgres
+    develop:
+      watch:
+        - action: rebuild
+          path: ./backend/
+    profiles: ["dev"]
 
   classifier:
     container_name: classifier
@@ -50,6 +101,7 @@ services:
     restart: always
     networks:
       - backend
+      - backend-dev
     ports:
       - 5000:5000
     volumes:
@@ -57,6 +109,7 @@ services:
         target: /pixil-media/
         source: /usr/local/pixil/
         read_only: true
+    profiles: ["dev", "prod"]
 
   postgres:
     container_name: postgres
@@ -73,16 +126,22 @@ services:
     restart: always
     networks:
       - backend
+      - backend-dev
     healthcheck:
       test: ["CMD", "pg_isready", "${POSTGRES_DB}", "-U", "${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
-      
+    profiles: ["dev", "prod"]
+
 networks:
   frontend:
     driver: bridge
   backend:
+    driver: bridge
+  frontend-dev:
+    driver: bridge
+  backend-dev:
     driver: bridge
 
 volumes:
