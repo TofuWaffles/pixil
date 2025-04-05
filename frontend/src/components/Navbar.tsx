@@ -215,7 +215,7 @@ export default function MainDrawer() {
           </IconButton>
           <Logo />
           <Typography variant="h5" noWrap component="div">
-            Pixil
+            {`Hello, ${accessTokenClaims.username}`}
           </Typography>
           <div className='absolute right-5'>
             <UploadButton />
