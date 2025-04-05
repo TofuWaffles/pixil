@@ -64,7 +64,7 @@ export default function StorageInfo() {
               align="right"
               variant="subtitle1"
             >
-              {`Free: ${Math.round((storageStats.capacity - storageStats.used) / (10 ** 9))} GB`}
+              {`Free: ${Math.round((storageStats.capacity - storageStats.used) / (10 ** 9))} GB (${Math.round((storageStats.capacity - storageStats.used) / storageStats.capacity * 100)}%)`}
             </Typography>
           </Grid2>
         </CardContent>
