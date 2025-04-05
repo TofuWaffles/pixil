@@ -27,6 +27,7 @@ import getCookie from '../utils/GetCookie';
 import { AccessTokenClaims } from '../types/Models';
 import { AdminPanelSettings, Logout } from '@mui/icons-material';
 import removeCookie from '../utils/RemoveCookie';
+import Tooltip from '@mui/material/Tooltip';
 
 const drawerWidth = 240;
 
@@ -219,26 +220,30 @@ export default function MainDrawer() {
           <div className='absolute right-5'>
             <UploadButton />
             {accessTokenClaims.userType == 1 &&
+              <Tooltip title="Admin Settings">
+                <IconButton
+                  sx={{
+                    m: 1
+                  }}
+                  onClick={() => window.location.href = "/admin"}
+                >
+                  <AdminPanelSettings />
+                </IconButton>
+              </Tooltip>
+            }
+            <Tooltip title="Logout">
               <IconButton
                 sx={{
                   m: 1
                 }}
-                onClick={() => window.location.href = "/admin"}
+                onClick={() => {
+                  removeCookie("Access-Token");
+                  window.location.href = "/login";
+                }}
               >
-                <AdminPanelSettings />
+                <Logout />
               </IconButton>
-            }
-            <IconButton
-              sx={{
-                m: 1
-              }}
-              onClick={() => {
-                removeCookie("Access-Token");
-                window.location.href = "/login";
-              }}
-            >
-              <Logout />
-            </IconButton>
+            </Tooltip>
           </div>
         </Toolbar>
       </AppBar>
