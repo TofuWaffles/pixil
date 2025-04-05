@@ -233,7 +233,7 @@ func (e Env) CreateDefaultAdmin() error {
 	}
 	newAdmin := models.User{
 		Email:        "admin@admin.com",
-		Username:     "Default Admin",
+		Username:     "Admin",
 		PasswordHash: string(passwordHash),
 		UserType:     models.Admin,
 	}
