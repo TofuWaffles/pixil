@@ -157,7 +157,25 @@ services:
         target: /pixil-media/
         source: /usr/local/pixil/
         read_only: true
-    profiles: ["dev", "prod"]
+    profiles: ["prod"]
+    
+  classifier-dev:
+    container_name: classifier-dev
+    build:
+      context: ./classifier/
+      dockerfile: Dockerfile
+    restart: always
+    networks:
+      - backend
+      - backend-dev
+    ports:
+      - 5000:5000
+    volumes:
+      - type: bind
+        target: /pixil-media/
+        source: /usr/local/pixil-dev/
+        read_only: true
+    profiles: ["dev"]
 
 networks:
   frontend:

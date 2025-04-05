@@ -16,7 +16,8 @@ class ClassificationHandler(BaseHTTPRequestHandler):
         query_params = parse_qs(url.query)
         logging.info("Classifying image: ", query_params)
         self._set_response()
-        results = model("/pixil-media/" + str(query_params.get("filename"))[2:-2])
+        results = model("/pixil-media/" +
+                        str(query_params.get("filename"))[2:-2])
         labels = set()
         for r in results:
             for t in r.summary():
@@ -33,11 +34,12 @@ def run(server_class=HTTPServer, handler_class=ClassificationHandler, port=5000)
     httpd = server_class(server_address, handler_class)
     logging.info("Starting classification server...\n")
     try:
+        logging.info("Classification server started...\n")
         httpd.serve_forever()
     except KeyboardInterrupt:
         pass
     httpd.server_close()
-    logging.info("Stopping classification server...\n")
+    logging.info("Stopping classification server!\n")
 
 
 if __name__ == "__main__":
