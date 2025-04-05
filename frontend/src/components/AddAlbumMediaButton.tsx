@@ -73,6 +73,7 @@ function AddAlbumMediaDialog({
       <DialogContent>
         <InputLabel variant="standard">Album</InputLabel>
         <Select
+          variant='filled'
           labelId="album-select"
           id="album-select"
           value={albumSelect}
@@ -83,7 +84,10 @@ function AddAlbumMediaDialog({
           {albumComponents}
         </Select>
         <Button
-          sx={{ backgroundColor: "secondary.main" }}
+          sx={{
+            m: 1,
+            backgroundColor: "secondary.main"
+          }}
           component="label"
           role={undefined}
           variant="contained"
@@ -98,7 +102,7 @@ function AddAlbumMediaDialog({
               "/album_media",
               true
             );
-            // TODO: handle the error I guess
+            setOpen(false);
           }}
         >
           Add
