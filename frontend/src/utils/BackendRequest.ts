@@ -24,7 +24,10 @@ export default async function backendRequest(data: any, method: string, path: st
 
   request.headers = headers;
 
-  const response = await fetch(import.meta.env.VITE_BACKEND_URL + path, request);
+  console.log("mode: ", import.meta.env.MODE);
+  console.log("backend url: ", process.env.BACKEND_URL);
+
+  const response = await fetch(process.env.BACKEND_URL + path, request);
   if (!response.ok) {
     throw response.status
   }

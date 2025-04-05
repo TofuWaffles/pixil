@@ -4,6 +4,9 @@ services:
     build:
       context: ./frontend/
       dockerfile: Dockerfile
+      args:
+        DOMAIN_URL: "${DOMAIN_URL}"
+        BACKEND_URL: "${DOMAIN_URL}:4000"
     restart: always
     networks:
       - frontend
@@ -47,7 +50,7 @@ services:
       ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
       DOMAIN_URL: "${DOMAIN_URL}"
       FRONTEND_URL: "${DOMAIN_URL}"
-      LOG_LEVEL: "debug"
+      LOG_LEVEL: "DEBUG"
     networks:
       - frontend
       - backend

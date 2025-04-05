@@ -14,7 +14,11 @@ export default function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route element={<AdminRoute />}>
+          <Route path="/admin" element={<AdminPanel />} />
+        </Route>
         <Route element={<MemberRoute />}>
+          <Route path="/login" element={<Login />} />
           <Route path="/" element={<MainLayout />}>
             <Route path="" element={<Home />} />
             <Route path="search" element={<SearchPage />} />
@@ -24,10 +28,6 @@ export default function AppRoutes() {
           <Route path="/media" element={<MediaView />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
-        <Route element={<AdminRoute />}>
-          <Route path="/admin" element={<AdminPanel />} />
-        </Route>
-        <Route path="/login" element={<Login />} />
       </Routes>
     </BrowserRouter>
   );
