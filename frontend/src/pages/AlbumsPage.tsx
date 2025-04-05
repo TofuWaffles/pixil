@@ -83,13 +83,27 @@ export default function AlbumsPage() {
   return (
     <Box>
       <AlbumPageHeader />
-      <div className="lg: size-9/12">
-        <Grid2 container direction="row" spacing={1}>
-          <List>
-            {thumbnailComponents}
-          </List>
-        </Grid2 >
-      </div>
+      {albumThumbnails.length == 0 ?
+        <Grid2
+          container
+          spacing={0}
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
+          sx={{ minHeight: '100vh' }}
+        >
+          <Typography variant="h5">
+            No albums yet. Create one to start organizing your photos and videos.
+          </Typography>
+        </Grid2> :
+        <div className="lg: size-9/12">
+          <Grid2 container direction="row" spacing={1}>
+            <List>
+              {thumbnailComponents}
+            </List>
+          </Grid2 >
+        </div>
+      }
     </Box>
   )
 }
@@ -135,8 +149,10 @@ function CreateAlbumButton() {
           m: 1,
           color: "secondary.main",
         }}
-        InputLabelProps={{
-          color: "secondary"
+        slotProps={{
+          inputLabel: {
+            color: "secondary"
+          }
         }}
         error={error}
         id="album-name"

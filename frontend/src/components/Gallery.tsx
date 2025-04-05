@@ -5,6 +5,9 @@ import ListItem from "@mui/material/ListItem";
 import List from "@mui/material/List";
 import backendRequest from "../utils/BackendRequest";
 import DateFormat from "../types/DateFormat";
+import UploadButton from "./UploadButton";
+import Grid2 from "@mui/material/Grid2";
+import Typography from "@mui/material/Typography";
 
 
 export default function Gallery({ queryParams }: { queryParams: string | null }) {
@@ -79,6 +82,24 @@ export default function Gallery({ queryParams }: { queryParams: string | null })
     )
   })
 
+  if (thumbnails.length == 0) {
+    return (
+      <Grid2
+        container
+        spacing={0}
+        direction="column"
+        alignItems="center"
+        justifyContent="center"
+        sx={{ minHeight: '100vh' }}
+      >
+        <Typography variant="h5">
+          Looks a little lonely. Let's change that.
+        </Typography>
+        <UploadButton />
+      </Grid2>
+    )
+  }
+
   return (
     <div className="flex h-screen flex-col">
       <div style={{ display: "flex-1", flexWrap: "wrap", gap: "10px" }}>
@@ -86,6 +107,6 @@ export default function Gallery({ queryParams }: { queryParams: string | null })
           {thumbnailGroupComponents}
         </List>
       </div>
-    </div >
+    </div>
   );
 }
