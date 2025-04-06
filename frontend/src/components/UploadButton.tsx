@@ -1,6 +1,7 @@
 import { Button, styled } from "@mui/material";
 import CloudUploadIcon from '@mui/icons-material/Upload';
-import backendRequest from "../utils/BackendRequest";
+import { useContext } from "react";
+import { BackendApiContext } from "../App";
 
 
 const VisuallyHiddenInput = styled('input')({
@@ -16,6 +17,7 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 export default function UploadButton() {
+  const backendApi = useContext(BackendApiContext);
   return (
     <Button
       component="label"
@@ -35,12 +37,8 @@ export default function UploadButton() {
           if (event.target == null) {
             return;
           }
-          const data = new FormData();
-          data.append('file', event.target.files![0])
-          data.append('name', 'User media')
-          data.append('desc', 'A piece of media uploaded by the user')
           try {
-            await backendRequest(data, "POST", "/media", true);
+            await backendApi.postMedia(event.target.files![0]);
             window.location.reload();
           } catch (statusCode: any) {
             console.log(statusCode);

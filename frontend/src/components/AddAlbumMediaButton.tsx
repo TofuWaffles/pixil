@@ -1,8 +1,7 @@
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import IconButton from '@mui/material/IconButton';
-import backendRequest from '../utils/BackendRequest';
-import React, { ReactElement } from 'react';
-import { Album, AlbumMedia, } from '../types/Models';
+import React, { ReactElement, useContext } from 'react';
+import { Album } from '../types/Models';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
@@ -12,6 +11,7 @@ import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
+import { BackendApiContext } from '../App';
 
 export default function AddAlbumMediaButton({ mediaId }: { mediaId: number }) {
   const [open, setOpen] = React.useState(false);
@@ -45,14 +45,15 @@ function AddAlbumMediaDialog({
   open: boolean,
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }) {
+  const backendApi = useContext(BackendApiContext);
   const [albums, setAlbums] = React.useState<Album[]>([]);
   const [albumSelect, setAlbumSelect] = React.useState(1);
 
   React.useEffect(() => {
     const fetchAlbums = async () => {
       try {
-        const response = await backendRequest(null, "GET", "/albums", true);
-        setAlbums(await response.json())
+        const albums = await backendApi.getAlbums();
+        setAlbums(albums)
       } catch {
         console.log("Something went wrong when retrieving the albums");
       }
@@ -103,15 +104,7 @@ function AddAlbumMediaDialog({
           variant="contained"
           tabIndex={-1}
           onClick={async () => {
-            await backendRequest(
-              JSON.stringify({
-                albumId: albumSelect,
-                mediaId: mediaId,
-              } as AlbumMedia),
-              "POST",
-              "/album_media",
-              true
-            );
+            await backendApi.postAlbumMedia(albumSelect, mediaId);
             setOpen(false);
           }}
         >

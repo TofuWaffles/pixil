@@ -1,48 +1,34 @@
-import React, { ReactElement } from "react";
+import React, { ReactElement, useContext } from "react";
 import { Thumbnail } from "../types/Models";
 import ThumbnailGroup from "./ThumbnailGroup";
 import ListItem from "@mui/material/ListItem";
 import List from "@mui/material/List";
-import backendRequest from "../utils/BackendRequest";
 import DateFormat from "../types/DateFormat";
 import UploadButton from "./UploadButton";
 import Grid2 from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
+import { BackendApiContext } from "../App";
 
 
 export default function Gallery({ queryParams }: { queryParams: string | null }) {
   const [thumbnails, setThumbnails] = React.useState<{ id: number; createdAt: Date; src: string }[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const backendApi = useContext(BackendApiContext);
 
   React.useEffect(() => {
     const fetchImages = async () => {
       try {
-        let requestPath = "/media?status=0";
-        if (queryParams != null) {
-          requestPath += `&${queryParams}`
-        }
-        const response = await backendRequest(null, "GET", requestPath, true);
-        if (!response.ok) {
-          throw new Error(`Error fetching image IDs: ${response.statusText}`);
-        }
+        const mediaList = await backendApi.getMediaList(queryParams);
+        const media = mediaList.map((item) => { return { id: item.id, createdAt: new Date(item.createdAt) } });
 
-        const mediaList = await response.json();
-        const media = mediaList.map((item: { id: number, createdAt: string }) => { return { id: item.id, createdAt: new Date(item.createdAt) } });
-
-        const imagePromises = media.map(async (m: Thumbnail) => {
-          const imageResponse = await backendRequest(null, "GET", `/thumbnail?id=${m.id}`, true);
-          if (!imageResponse.ok) {
-            throw new Error(`Error fetching image with ID ${m.id}: ${imageResponse.statusText}`);
-          }
-
-          const imageBlob = await imageResponse.blob();
-          const imageUrl = URL.createObjectURL(imageBlob);
-          return { id: m.id, createdAt: m.createdAt, src: imageUrl };
+        const thumbnailPromises = media.map(async (m) => {
+          const thumbnailUrl = await backendApi.getThumbnail(m.id);
+          return { id: m.id, createdAt: m.createdAt, src: thumbnailUrl };
         });
 
         // Wait for all image fetches to complete
-        const thumbnails = await Promise.all(imagePromises);
+        const thumbnails = await Promise.all(thumbnailPromises);
         setThumbnails(thumbnails);
       } catch (err: any) {
         setError(err.message);

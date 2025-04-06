@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useContext } from "react";
 import { User } from "../types/Models";
-import backendRequest from "../utils/BackendRequest";
 import Grid2 from "@mui/material/Grid2";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -17,20 +16,17 @@ import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
 import Paper from "@mui/material/Paper";
 import TableBody from "@mui/material/TableBody";
+import { BackendApiContext } from "../App";
 
 export default function UserSettings() {
   const [users, setUsers] = React.useState<User[]>([]);
   const [userSettingsError, setUserSettingsError] = React.useState("");
+  const backendApi = useContext(BackendApiContext);
 
   React.useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const usersResponse = await backendRequest(null, "GET", "/user", true)
-        if (!usersResponse.ok) {
-          throw new Error(`Error fetching users: ${usersResponse.statusText}`);
-        }
-        const users: User[] = await usersResponse.json();
-
+        const users: User[] = await backendApi.getUsers();
         setUsers(users);
       } catch (err: any) {
         setUserSettingsError(err);

@@ -3,7 +3,7 @@ import FormHelperText from "@mui/material/FormHelperText";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import useTheme from "@mui/material/styles/useTheme";
-import React from "react";
+import React, { useContext } from "react";
 import validateEmail from "../utils/ValidateEmail";
 import validatePassword from "../utils/ValidatePassword";
 import Select from "@mui/material/Select";
@@ -14,14 +14,15 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Alert from "@mui/material/Alert";
 import PersonAdd from "@mui/icons-material/PersonAdd";
-import backendRequest from "../utils/BackendRequest";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import Visibility from "@mui/icons-material/Visibility";
+import { BackendApiContext } from "../App";
 
 export default function CreateUserForm() {
   const theme = useTheme();
+  const backendApi = useContext(BackendApiContext);
   const [email, setEmail] = React.useState("");
   const [emailError, setEmailError] = React.useState("");
   const [username, setUsername] = React.useState("");
@@ -219,24 +220,11 @@ export default function CreateUserForm() {
               return;
             }
             try {
-              const response = await backendRequest(JSON.stringify({
-                email: email,
-                username: username,
-                password: password,
-                userType: userType,
-              }),
-                "POST",
-                "/user",
-                true,
-              )
-              if (response.ok) {
-                setCreateUserSuccess("The new user has been created!");
-                setCreateUserError("");
-              } else {
-                throw response.status;
-              }
-            } catch (statusCode: any) {
-              switch (statusCode) {
+              await backendApi.postUser(email, username, password, userType);
+              setCreateUserSuccess("The new user has been created!");
+              setCreateUserError("");
+            } catch (response: any) {
+              switch (response.status) {
                 case 409:
                   setCreateUserError("User with the provided email address already exists");
                   break;

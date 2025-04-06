@@ -1,5 +1,4 @@
-import React, { ReactElement } from "react"
-import backendRequest from "../utils/BackendRequest";
+import React, { ReactElement, useContext } from "react"
 import { Album, Media, Thumbnail } from "../types/Models";
 import ListItem from "@mui/material/ListItem";
 import ThumbnailBox from "../components/ThumbnailBox";
@@ -11,39 +10,27 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import { Button, List } from "@mui/material";
 import GrayBackground from "../assets/gray-background.png"
+import { BackendApiContext } from "../App";
 
 export default function AlbumsPage() {
   const [error, setError] = React.useState("");
   const [loading, setLoading] = React.useState(true);
   const [albumThumbnails, setAlbumThumbnails] = React.useState<[Album, Thumbnail][]>([]);
+  const backendApi = useContext(BackendApiContext);
 
   React.useEffect(() => {
     const fetchImages = async () => {
       try {
-        const response = await backendRequest(null, "GET", "/albums", true);
-        if (!response.ok) {
-          throw new Error(`Error albums: ${response.statusText}`);
-        }
-
-        const albums: Album[] = await response.json();
+        const albums: Album[] = await backendApi.getAlbums();
 
         albums.forEach(async (album) => {
-          const response = await backendRequest(null, "GET", `/media?album=${album.id}`, true);
-          if (!response.ok) {
-            throw new Error(`Error fetching image IDs: ${response.statusText}`);
-          }
-          const albumMedia: Media[] = await response.json();
+          const albumMedia: Media[] = await backendApi.getAlbumMedia(album.id);
 
           let imageUrl = GrayBackground;
           let createdAt = new Date();
 
           if (albumMedia.length > 0) {
-            const imageResponse = await backendRequest(null, "GET", `/thumbnail?id=${albumMedia[0].id}`, true);
-            if (!imageResponse.ok) {
-              throw new Error(`Error fetching image with ID ${albumMedia[0].id}: ${imageResponse.statusText} `);
-            }
-            const imageBlob = await imageResponse.blob();
-            imageUrl = URL.createObjectURL(imageBlob);
+            imageUrl = await backendApi.getThumbnail(albumMedia[0].id);
             createdAt = new Date(albumMedia[0].createdAt * 1000);
           }
 
@@ -135,6 +122,7 @@ function AlbumPageHeader() {
 }
 
 function CreateAlbumButton() {
+  const backendApi = useContext(BackendApiContext);
   const [albumName, setAlbumName] = React.useState("");
   const [error, setError] = React.useState(false);
 
@@ -173,10 +161,7 @@ function CreateAlbumButton() {
             setError(true);
             return;
           }
-          const response = await backendRequest(null, "POST", `/albums?name=${albumName}`, true);
-          if (!response.ok) {
-            console.log("Something went wrong with the post request :/");
-          }
+          await backendApi.postAlbum(albumName);
         }}
       >
         Create

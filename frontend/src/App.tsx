@@ -1,8 +1,14 @@
 import { createTheme } from "@mui/material";
 import AppRoutes from "./Routes";
 import { ThemeProvider } from "@emotion/react";
+import BackendApi from "./api/Backend";
+import React from "react";
+
+export const BackendApiContext = React.createContext(new BackendApi());
 
 export default function App() {
+  const backendApi = new BackendApi();
+
   const theme = createTheme({
     palette: {
       primary: {
@@ -39,7 +45,9 @@ export default function App() {
   });
   return (
     <ThemeProvider theme={theme}>
-      <AppRoutes></AppRoutes>
+      <BackendApiContext.Provider value={backendApi}>
+        <AppRoutes></AppRoutes>
+      </BackendApiContext.Provider>
     </ThemeProvider>
   )
 }

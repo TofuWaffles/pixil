@@ -4,16 +4,17 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
-import React, { ReactElement } from "react";
-import backendRequest from "../utils/BackendRequest";
+import React, { ReactElement, useContext } from "react";
 import Chip from "@mui/material/Chip";
 import DialogContent from "@mui/material/DialogContent";
 import Typography from "@mui/material/Typography";
 import DateFormat from "../types/DateFormat";
 import { Media } from "../types/Models";
 import Tooltip from "@mui/material/Tooltip";
+import { BackendApiContext } from "../App";
 
 export default function MediaDetails({ mediaID }: { mediaID: number }) {
+  const backendApi = useContext(BackendApiContext);
   const [open, setOpen] = React.useState(false);
   const [details, setDetails] = React.useState<Media>({
     id: -1,
@@ -28,11 +29,7 @@ export default function MediaDetails({ mediaID }: { mediaID: number }) {
   React.useEffect(() => {
     const fetchImage = async () => {
       try {
-        const detailsResponse = await backendRequest(null, "GET", `/media?id=${mediaID}`, true);
-        if (!detailsResponse.ok) {
-          throw new Error(`Error fetching details for media with ID ${mediaID}: ${detailsResponse.statusText}`);
-        }
-        const details: Media = await detailsResponse.json();
+        const details: Media = await backendApi.getMediaDetails(mediaID);
         setDetails(details);
       } catch (err: any) {
         console.log(err);

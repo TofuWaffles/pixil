@@ -1,15 +1,14 @@
 import ArrowBack from "@mui/icons-material/ArrowBack";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
-import React from "react";
+import React, { useContext } from "react";
 import ReactPlayer from "react-player";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import backendRequest from "../utils/BackendRequest";
 import MediaDetails from "../components/MediaDetails";
 import AddAlbumMediaButton from "../components/AddAlbumMediaButton";
 import MediaDeleteButton from "../components/MediaDeleteButton";
 import Tooltip from "@mui/material/Tooltip";
-
+import { BackendApiContext } from "../App";
 
 export default function MediaView() {
   const [idParam, _] = useSearchParams();
@@ -17,18 +16,16 @@ export default function MediaView() {
   const [isVideo, setIsVideo] = React.useState(false);
   const nagivate = useNavigate();
   const mediaID: number = +idParam.get("id")!;
+  const backendApi = useContext(BackendApiContext);
 
   React.useEffect(() => {
     const fetchImage = async () => {
       try {
-        const imageResponse = await backendRequest(null, "GET", `/media_content?id=${mediaID}`, true);
-        if (imageResponse === undefined || !imageResponse.ok) {
-          throw new Error(`Error fetching image with ID ${mediaID}: ${imageResponse.statusText}`);
-        }
-        if (imageResponse.headers.get("content-type")?.startsWith("video")) {
+        const imageResponse = await backendApi.getMediaContent(mediaID);
+        if (imageResponse!.headers.get("content-type")?.startsWith("video")) {
           setIsVideo(true);
         }
-        const imageBlob = await imageResponse.blob();
+        const imageBlob = await imageResponse!.blob();
         setMediaUrl(URL.createObjectURL(imageBlob));
       } catch (err: any) {
         console.log(err);

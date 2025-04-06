@@ -5,9 +5,10 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import SearchIcon from '@mui/icons-material/Search';
-import backendRequest from '../utils/BackendRequest';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import { useContext } from 'react';
+import { BackendApiContext } from '../App';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -44,11 +45,11 @@ const StyledTextField = styled(TextField)(({ }) => ({
 
 export default function SearchBar({ setSearchQuery }: { setSearchQuery: React.Dispatch<React.SetStateAction<string>> }) {
   const [tags, setTags] = React.useState<string[]>([]);
+  const backendApi = useContext(BackendApiContext);
 
   React.useEffect(() => {
     const fetchTags = async () => {
-      const response = await backendRequest(null, "GET", "/tags", true);
-      const tags: string[] = await response.json();
+      const tags = await backendApi.getTags();
 
       setTags(tags);
     }

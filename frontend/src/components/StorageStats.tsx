@@ -1,7 +1,7 @@
 import { Box, Card, CardContent, Grid2, LinearProgress, linearProgressClasses, styled, Typography } from "@mui/material";
-import React from "react";
+import React, { useContext } from "react";
 import { StorageStats } from "../types/Models";
-import backendRequest from "../utils/BackendRequest";
+import { BackendApiContext } from "../App";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 10,
@@ -22,6 +22,7 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
 }));
 
 export default function StorageInfo() {
+  const backendApi = useContext(BackendApiContext);
   const [storageStats, setStorageStats] = React.useState<StorageStats>({
     capacity: 1,
     used: 1,
@@ -29,8 +30,8 @@ export default function StorageInfo() {
 
   React.useEffect(() => {
     const fetchStorageStats = async () => {
-      const response = await backendRequest(null, "GET", "/storage", true);
-      setStorageStats(await response.json());
+      const storage = await backendApi.getStorage();
+      setStorageStats(storage);
     }
 
     fetchStorageStats();

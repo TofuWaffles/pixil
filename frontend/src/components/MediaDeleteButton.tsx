@@ -1,9 +1,12 @@
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from '@mui/icons-material/Delete';
-import backendRequest from "../utils/BackendRequest";
 import Tooltip from "@mui/material/Tooltip";
+import { useContext } from "react";
+import { BackendApiContext } from "../App";
 
 export default function MediaDeleteButton({ mediaId }: { mediaId: number }) {
+  const backendApi = useContext(BackendApiContext);
+
   return (
     <Tooltip title="Delete">
       <IconButton
@@ -14,14 +17,8 @@ export default function MediaDeleteButton({ mediaId }: { mediaId: number }) {
           height: 100
         }}
         onClick={async () => {
-          const response = await backendRequest(null, "DELETE", `/media?id=${mediaId}`, true);
-
-          if (response.ok) {
-            window.location.href = "/";
-          } else {
-            console.log("Unable to archive media: ", response.text);
-
-          }
+          await backendApi.deleteMedia(mediaId);
+          window.location.href = "/";
         }}>
         <DeleteIcon sx={{ width: 40, height: 40 }} />
       </IconButton >

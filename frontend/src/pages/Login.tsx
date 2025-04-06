@@ -8,11 +8,11 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import useTheme from "@mui/material/styles/useTheme";
-import React from "react";
+import React, { useContext } from "react";
 import validateEmail from "../utils/ValidateEmail";
 import LoginIcon from '@mui/icons-material/Login';
-import backendRequest from "../utils/BackendRequest";
 import { useNavigate } from "react-router-dom";
+import { BackendApiContext } from "../App";
 
 export default function Login() {
   const theme = useTheme();
@@ -24,6 +24,7 @@ export default function Login() {
   const [loginError, setLoginError] = React.useState("");
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const navigate = useNavigate();
+  const backendApi = useContext(BackendApiContext);
 
   return (
     <Box
@@ -133,13 +134,13 @@ export default function Login() {
               return;
             }
             try {
-              const tokenObj: { token: string } = await (await loginOnClick(email, password)).json();
+              const tokenObj: { token: string } = await backendApi.login(email, password);
 
               document.cookie = `Access-Token=` + tokenObj.token + `; Max-Age=` + (55 * 60 * 24 * 7); // Cookie will expire 5 minutes before the token does
 
               navigate("/");
-            } catch (statusCode: any) {
-              switch (statusCode) {
+            } catch (response: any) {
+              switch (response.status) {
                 case 401:
                 case 404:
                   setLoginError("Invalid email address or password entered.");
@@ -156,20 +157,4 @@ export default function Login() {
       </Grid2>
     </Box>
   )
-}
-
-async function loginOnClick(email: string, password: string) {
-  const response = await backendRequest(JSON.stringify({
-    email: email,
-    password: password,
-  }),
-    "POST",
-    "/login",
-    false
-  )
-  if (!response.ok) {
-    throw response.status
-  }
-
-  return response;
 }
