@@ -29,3 +29,6 @@ pg.env
 
 # Classification model
 *.pt
+
+# Certbot
+certbot/*
