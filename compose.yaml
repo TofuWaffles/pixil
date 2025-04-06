@@ -47,6 +47,7 @@ services:
       JWT_KEY: "${JWT_KEY}"
       ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
       DOMAIN_URL: "${DOMAIN_URL}"
+      CLASSIFIER_URL: "http://classifier:5000"
       LOG_LEVEL: "DEBUG"
     networks:
       - frontend
@@ -76,7 +77,7 @@ services:
       JWT_KEY: "${JWT_KEY}"
       ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
       DOMAIN_URL: "http://localhost"
-      FRONTEND_URL: "http://localhost:3000"
+      CLASSIFIER_URL: "http://classifier-dev:5000"
     networks:
       - frontend-dev
       - backend-dev

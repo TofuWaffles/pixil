@@ -453,7 +453,9 @@ func (e Env) ClassifyMedia(mediaID int) {
 	}
 	filename := media.FileName
 
-	req, err := http.NewRequest("GET", "http://classifier:5000", nil)
+	classifierUrl := os.Getenv("CLASSIFIER_URL")
+
+	req, err := http.NewRequest("GET", classifierUrl, nil)
 	if err != nil {
 		e.Logger.Error("Unable to create the http request for media classification", "error", err)
 		return
