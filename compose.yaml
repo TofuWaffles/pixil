@@ -14,7 +14,6 @@ services:
       - 80:3000
     environment:
       VITE_DOMAIN_URL: "${DOMAIN_URL}"
-      VITE_BACKEND_URL: "${DOMAIN_URL}:4000"
     volumes:
       - /app/node_modules
       - ./frontend:/app
@@ -31,8 +30,7 @@ services:
     ports:
       - 3000:3000
     environment:
-      VITE_DOMAIN_URL: "http://localhost"
-      VITE_BACKEND_URL: "http://localhost:4000"
+      VITE_DOMAIN_URL: "http://localhost:3000"
     volumes:
       - /app/node_modules
       - ./frontend:/app
@@ -49,7 +47,6 @@ services:
       JWT_KEY: "${JWT_KEY}"
       ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
       DOMAIN_URL: "${DOMAIN_URL}"
-      FRONTEND_URL: "${DOMAIN_URL}"
       LOG_LEVEL: "DEBUG"
     networks:
       - frontend

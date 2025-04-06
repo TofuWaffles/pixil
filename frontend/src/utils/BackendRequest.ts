@@ -14,6 +14,7 @@ export default async function backendRequest(data: any, method: string, path: st
 
     if (token === null || token === undefined) {
       window.location.href = "/login";
+      return;
     }
     headers.set("Authorization", "Bearer " + token);
   }
@@ -24,10 +25,9 @@ export default async function backendRequest(data: any, method: string, path: st
 
   request.headers = headers;
 
-  console.log("mode: ", import.meta.env.MODE);
-  console.log("backend url: ", process.env.BACKEND_URL);
+  console.log("domain url: ", process.env.DOMAIN_URL);
 
-  const response = await fetch(process.env.BACKEND_URL + path, request);
+  const response = await fetch(process.env.DOMAIN_URL + "/api" + path, request);
   if (!response.ok) {
     throw response.status
   }
