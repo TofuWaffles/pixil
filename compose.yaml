@@ -7,7 +7,7 @@ services:
       args:
         DOMAIN_URL: "${DOMAIN_URL}"
         BACKEND_URL: "${DOMAIN_URL}:4000"
-    restart: always
+    restart: unless-stopped
     networks:
       - frontend
     ports:
@@ -24,7 +24,7 @@ services:
     build:
       context: ./frontend/
       dockerfile: Dockerfile.dev
-    restart: always
+    restart: unless-stopped
     networks:
       - frontend-dev
     ports:
@@ -41,7 +41,7 @@ services:
     build:
       context: ./backend/
       dockerfile: Dockerfile
-    restart: always
+    restart: unless-stopped
     environment:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable"
       JWT_KEY: "${JWT_KEY}"
@@ -71,7 +71,7 @@ services:
     build:
       context: ./backend/
       dockerfile: Dockerfile
-    restart: always
+    restart: unless-stopped
     environment:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-dev:5432/${POSTGRES_DB}?sslmode=disable"
       JWT_KEY: "${JWT_KEY}"
@@ -107,7 +107,7 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
       - ./sql:/docker-entrypoint-initdb.d
-    restart: always
+    restart: unless-stopped
     networks:
       - backend
     healthcheck:
@@ -129,7 +129,7 @@ services:
     volumes:
       - pg_data_dev:/var/lib/postgresql-dev/data
       - ./sql:/docker-entrypoint-initdb.d
-    restart: always
+    restart: unless-stopped
     networks:
       - backend-dev
     healthcheck:
@@ -144,7 +144,7 @@ services:
     build:
       context: ./classifier/
       dockerfile: Dockerfile
-    restart: always
+    restart: unless-stopped
     networks:
       - backend
       - backend-dev
@@ -162,7 +162,7 @@ services:
     build:
       context: ./classifier/
       dockerfile: Dockerfile
-    restart: always
+    restart: unless-stopped
     networks:
       - backend
       - backend-dev
