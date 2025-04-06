@@ -8,6 +8,7 @@ import backendRequest from "../utils/BackendRequest";
 import MediaDetails from "../components/MediaDetails";
 import AddAlbumMediaButton from "../components/AddAlbumMediaButton";
 import MediaDeleteButton from "../components/MediaDeleteButton";
+import Tooltip from "@mui/material/Tooltip";
 
 
 export default function MediaView() {
@@ -21,7 +22,7 @@ export default function MediaView() {
     const fetchImage = async () => {
       try {
         const imageResponse = await backendRequest(null, "GET", `/media_content?id=${mediaID}`, true);
-        if (!imageResponse.ok) {
+        if (imageResponse === undefined || !imageResponse.ok) {
           throw new Error(`Error fetching image with ID ${mediaID}: ${imageResponse.statusText}`);
         }
         if (imageResponse.headers.get("content-type")?.startsWith("video")) {
@@ -38,11 +39,13 @@ export default function MediaView() {
 
   return (
     <div className="bg-primary-contrast flex">
-      <IconButton aria-label="go back" sx={{ color: "white", width: 100, height: 100 }} onClick={() => {
-        nagivate(-1);
-      }}>
-        <ArrowBack sx={{ width: 40, height: 40 }} />
-      </IconButton>
+      <Tooltip title="Back">
+        <IconButton aria-label="go back" sx={{ color: "white", width: 100, height: 100 }} onClick={() => {
+          nagivate(-1);
+        }}>
+          <ArrowBack sx={{ width: 40, height: 40 }} />
+        </IconButton>
+      </Tooltip>
       {
         (isVideo)
           ? <div className="h-screen w-screen flex flex-row justify-center items-center">

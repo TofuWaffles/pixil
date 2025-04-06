@@ -11,6 +11,7 @@ import DialogContent from "@mui/material/DialogContent";
 import Typography from "@mui/material/Typography";
 import DateFormat from "../types/DateFormat";
 import { Media } from "../types/Models";
+import Tooltip from "@mui/material/Tooltip";
 
 export default function MediaDetails({ mediaID }: { mediaID: number }) {
   const [open, setOpen] = React.useState(false);
@@ -56,18 +57,20 @@ export default function MediaDetails({ mediaID }: { mediaID: number }) {
 
   return (
     <Box>
-      <IconButton
-        sx={{
-          color: "white",
-          width: 100,
-          height: 100,
-          right: 0,
-        }}
-        aria-label="more details"
-        onClick={() => setOpen(true)}
-      >
-        <MoreVert />
-      </IconButton>
+      <Tooltip title="Details">
+        <IconButton
+          sx={{
+            color: "white",
+            width: 100,
+            height: 100,
+            right: 0,
+          }}
+          aria-label="more details"
+          onClick={() => setOpen(true)}
+        >
+          <MoreVert />
+        </IconButton>
+      </Tooltip>
       <Dialog
         sx={{
           minHeight: "75vh",

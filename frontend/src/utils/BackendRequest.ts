@@ -14,7 +14,6 @@ export default async function backendRequest(data: any, method: string, path: st
 
     if (token === null || token === undefined) {
       window.location.href = "/login";
-      return;
     }
     headers.set("Authorization", "Bearer " + token);
   }

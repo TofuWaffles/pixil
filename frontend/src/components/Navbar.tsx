@@ -129,52 +129,54 @@ function DrawerItem({
 }) {
   return (
     <ListItem key={name} disablePadding sx={{ display: 'block' }}>
-      <ListItemButton
-        sx={[
-          {
-            minHeight: 48,
-            px: 2.5,
-          },
-          open
-            ? {
-              justifyContent: 'initial',
-            }
-            : {
-              justifyContent: 'center',
-            },
-        ]}
-        onClick={onClick}
-      >
-        <ListItemIcon
+      <Tooltip title={name}>
+        <ListItemButton
           sx={[
             {
-              minWidth: 0,
-              justifyContent: 'center',
+              minHeight: 48,
+              px: 2.5,
             },
             open
               ? {
-                mr: 3,
+                justifyContent: 'initial',
               }
               : {
-                mr: 'auto',
+                justifyContent: 'center',
               },
           ]}
+          onClick={onClick}
         >
-          {icon}
-        </ListItemIcon>
-        <ListItemText
-          primary={name}
-          sx={[
-            open
-              ? {
-                opacity: 1,
-              }
-              : {
-                opacity: 0,
+          <ListItemIcon
+            sx={[
+              {
+                minWidth: 0,
+                justifyContent: 'center',
               },
-          ]}
-        />
-      </ListItemButton>
+              open
+                ? {
+                  mr: 3,
+                }
+                : {
+                  mr: 'auto',
+                },
+            ]}
+          >
+            {icon}
+          </ListItemIcon>
+          <ListItemText
+            primary={name}
+            sx={[
+              open
+                ? {
+                  opacity: 1,
+                }
+                : {
+                  opacity: 0,
+                },
+            ]}
+          />
+        </ListItemButton>
+      </Tooltip>
     </ListItem>
   )
 }
@@ -199,20 +201,22 @@ export default function MainDrawer() {
       <CssBaseline />
       <AppBar position="fixed" open={open}>
         <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={[
-              {
-                marginRight: 5,
-              },
-              open && { display: 'none' },
-            ]}
-          >
-            <MenuIcon />
-          </IconButton>
+          <Tooltip title="Expand Menu">
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              edge="start"
+              sx={[
+                {
+                  marginRight: 5,
+                },
+                open && { display: 'none' },
+              ]}
+            >
+              <MenuIcon />
+            </IconButton>
+          </Tooltip>
           <Logo />
           <Typography variant="h5" noWrap component="div">
             {`Hello, ${accessTokenClaims.username}`}

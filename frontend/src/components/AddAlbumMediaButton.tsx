@@ -1,26 +1,36 @@
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
 import IconButton from '@mui/material/IconButton';
 import backendRequest from '../utils/BackendRequest';
-import { Box, Button, Dialog, DialogContent, DialogTitle, InputLabel, MenuItem, Select } from '@mui/material';
 import React, { ReactElement } from 'react';
 import { Album, AlbumMedia, } from '../types/Models';
+import Box from '@mui/material/Box';
+import Tooltip from '@mui/material/Tooltip';
+import MenuItem from '@mui/material/MenuItem';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import Dialog from '@mui/material/Dialog';
+import Button from '@mui/material/Button';
 
 export default function AddAlbumMediaButton({ mediaId }: { mediaId: number }) {
   const [open, setOpen] = React.useState(false);
   return (
     <Box>
-      <IconButton
-        aria-label="add media to album"
-        sx={{
-          color: "white",
-          width: 100,
-          height: 100
-        }}
-        onClick={() => {
-          setOpen(true);
-        }}>
-        <LibraryAddIcon sx={{ width: 40, height: 40 }} />
-      </IconButton >
+      <Tooltip title="Add to Album">
+        <IconButton
+          aria-label="add media to album"
+          sx={{
+            color: "white",
+            width: 100,
+            height: 100
+          }}
+          onClick={() => {
+            setOpen(true);
+          }}>
+          <LibraryAddIcon sx={{ width: 40, height: 40 }} />
+        </IconButton >
+      </Tooltip>
       <AddAlbumMediaDialog mediaId={mediaId} open={open} setOpen={setOpen} />
     </Box>
   )
