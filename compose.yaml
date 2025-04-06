@@ -174,8 +174,10 @@ services:
 
   nginx:
     container_name: nginx
+    build:
+      context: ./nginx/
+      dockerfile: Dockerfile
     restart: unless-stopped
-    image: nginx
     ports:
       - 80:80
       - 443:443
@@ -185,7 +187,6 @@ services:
     environment:
       DOMAIN_URL: ${DOMAIN_URL}
     volumes:
-      - ./nginx/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
     profiles: ["prod"]
