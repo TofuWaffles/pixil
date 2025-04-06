@@ -5,15 +5,12 @@ services:
       context: ./frontend/
       dockerfile: Dockerfile
       args:
-        DOMAIN_URL: "${DOMAIN_URL}"
-        BACKEND_URL: "${DOMAIN_URL}:4000"
+        DOMAIN_URL: "https://${DOMAIN_URL}"
     restart: unless-stopped
     networks:
       - frontend
-    ports:
-      - 80:3000
     environment:
-      VITE_DOMAIN_URL: "${DOMAIN_URL}"
+      VITE_DOMAIN_URL: "https://${DOMAIN_URL}"
     volumes:
       - /app/node_modules
       - ./frontend:/app
@@ -46,7 +43,7 @@ services:
       DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable"
       JWT_KEY: "${JWT_KEY}"
       ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
-      DOMAIN_URL: "${DOMAIN_URL}"
+      DOMAIN_URL: "https://${DOMAIN_URL}"
       CLASSIFIER_URL: "http://classifier:5000"
       LOG_LEVEL: "DEBUG"
     networks:
@@ -174,6 +171,31 @@ services:
         source: /usr/local/pixil-dev/
         read_only: true
     profiles: ["dev"]
+
+  nginx:
+    container_name: nginx
+    restart: unless-stopped
+    image: nginx
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - backend
+      - frontend
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    profiles: ["prod"]
+
+  certbot:
+    container_name: certbot
+    image: certbot/certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: certonly --webroot -w /var/www/certbot --force-renewal --email ${EMAIL} -d ${DOMAIN_URL} --agree-tos --non-interactive
+    profiles: ["prod"]
 
 networks:
   frontend:

@@ -77,6 +77,8 @@ func (e Env) AllowCORS(allowedOrigin string) Middleware {
 				w.Header().Set("Access-Control-Allow-Credentials", "true")
 			}
 
+			e.Logger.Info("Checking response headers", "Allow origin", w.Header().Get("Access-Control-Allow-Origin"))
+
 			// Handle preflight request
 			if r.Method == http.MethodOptions {
 				w.WriteHeader(http.StatusOK)
