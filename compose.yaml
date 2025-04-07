@@ -217,7 +217,7 @@ services:
       - ./certbot/www:/var/www/certbot
     command: certonly --webroot -w /var/www/certbot --force-renewal --email ${EMAIL} -d ${DOMAIN_URL} --agree-tos --non-interactive -v
     depends_on:
-      - nginx
+      - nginx-80
     profiles: ["prod"]
 
 networks:
