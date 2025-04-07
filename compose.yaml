@@ -172,16 +172,32 @@ services:
         read_only: true
     profiles: ["dev"]
 
-  nginx:
+  nginx-80:
     container_name: nginx
     build:
-      context: ./nginx/
+      context: ./nginx/http/
       dockerfile: Dockerfile
       args:
         DOMAIN_URL: "https://${DOMAIN_URL}"
     restart: unless-stopped
     ports:
       - 80:80
+    environment:
+      DOMAIN_URL: ${DOMAIN_URL}
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    profiles: ["prod"]
+
+  nginx-443:
+    container_name: nginx
+    build:
+      context: ./nginx/https/
+      dockerfile: Dockerfile
+      args:
+        DOMAIN_URL: "https://${DOMAIN_URL}"
+    restart: unless-stopped
+    ports:
       - 443:443
     networks:
       - backend
