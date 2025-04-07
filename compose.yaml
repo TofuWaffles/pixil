@@ -173,7 +173,7 @@ services:
     profiles: ["dev"]
 
   nginx-80:
-    container_name: nginx
+    container_name: nginx-80
     build:
       context: ./nginx/http/
       dockerfile: Dockerfile
@@ -190,7 +190,7 @@ services:
     profiles: ["prod"]
 
   nginx-443:
-    container_name: nginx
+    container_name: nginx-443
     build:
       context: ./nginx/https/
       dockerfile: Dockerfile
