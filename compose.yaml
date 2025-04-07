@@ -200,6 +200,8 @@ services:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
     command: certonly --webroot -w /var/www/certbot --force-renewal --email ${EMAIL} -d ${DOMAIN_URL} --agree-tos --non-interactive -vv
+    depends_on:
+      - nginx
     profiles: ["prod"]
 
 networks:
