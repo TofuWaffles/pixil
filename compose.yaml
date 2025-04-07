@@ -199,7 +199,7 @@ services:
     volumes:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
-    command: certonly --webroot -w /var/www/certbot --force-renewal --email ${EMAIL} -d ${DOMAIN_URL} --agree-tos --non-interactive -vvv
+    command: tail -F anything && certonly --webroot -w /var/www/certbot --force-renewal --email ${EMAIL} -d ${DOMAIN_URL} --agree-tos --non-interactive -vvv
     profiles: ["prod"]
 
 networks:
