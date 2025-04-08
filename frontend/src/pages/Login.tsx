@@ -14,6 +14,7 @@ import LoginIcon from '@mui/icons-material/Login';
 import { useNavigate } from "react-router-dom";
 import { BackendApiContext } from "../App";
 import ErrorBox from "../components/ErrorBox";
+import Banner from "../components/Banner";
 
 export default function Login() {
   const theme = useTheme();
@@ -49,6 +50,7 @@ export default function Login() {
           minHeight: '100vh',
         }}
       >
+        <Banner />
         <ErrorBox message={loginError} />
         <FormControl sx={{ m: 2, width: "80%", backgroundColor: theme.palette.primary.light }} variant="outlined">
           <InputLabel htmlFor="outlined-adornment-email">Email Address</InputLabel>
