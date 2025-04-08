@@ -2,6 +2,8 @@ import { Box, Card, CardContent, Grid2, LinearProgress, linearProgressClasses, s
 import React, { useContext } from "react";
 import { StorageStats } from "../types/Models";
 import { BackendApiContext } from "../App";
+import LoadingIcon from "./LoadingIcon";
+import ErrorBox from "./ErrorBox";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 10,
@@ -23,6 +25,8 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
 
 export default function StorageInfo() {
   const backendApi = useContext(BackendApiContext);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState("");
   const [storageStats, setStorageStats] = React.useState<StorageStats>({
     capacity: 1,
     used: 1,
@@ -34,8 +38,17 @@ export default function StorageInfo() {
       setStorageStats(storage);
     }
 
-    fetchStorageStats();
+    try {
+      fetchStorageStats();
+    } catch (err) {
+      setError("There was an issue getting the storage stats on the server");
+    } finally {
+      setLoading(false);
+    }
   }, [])
+
+  if (loading) return <LoadingIcon />;
+  if (error) return <ErrorBox message={error} />;
 
   return (
     <Box>
