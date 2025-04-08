@@ -12,13 +12,14 @@ import Grid2 from "@mui/material/Grid2";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import Alert from "@mui/material/Alert";
 import PersonAdd from "@mui/icons-material/PersonAdd";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import Visibility from "@mui/icons-material/Visibility";
 import { BackendApiContext } from "../App";
+import ErrorBox from "./ErrorBox";
+import SuccessBox from "./SuccessBox";
 
 export default function CreateUserForm() {
   const theme = useTheme();
@@ -71,12 +72,8 @@ export default function CreateUserForm() {
           }
         }}
       >
-        {
-          (createUserSuccess.length > 0) && <Alert severity="success" variant="filled" sx={{ m: 5 }}>{createUserSuccess}</Alert>
-        }
-        {
-          (createUserError.length > 0) && <Alert severity="error" variant="filled" sx={{ m: 5 }}>{createUserError}</Alert>
-        }
+        <SuccessBox message={createUserSuccess} />
+        <ErrorBox message={createUserError} />
         <FormControl variant="outlined">
           <InputLabel htmlFor="outlined-adornment-email">Email Address*</InputLabel>
           <OutlinedInput

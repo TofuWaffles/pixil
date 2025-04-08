@@ -1,6 +1,6 @@
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { Alert, Box, Button, FormHelperText, Typography } from "@mui/material";
+import { Box, Button, FormHelperText, Typography } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
 import Grid2 from "@mui/material/Grid2";
 import IconButton from "@mui/material/IconButton";
@@ -13,6 +13,7 @@ import validateEmail from "../utils/ValidateEmail";
 import LoginIcon from '@mui/icons-material/Login';
 import { useNavigate } from "react-router-dom";
 import { BackendApiContext } from "../App";
+import ErrorBox from "../components/ErrorBox";
 
 export default function Login() {
   const theme = useTheme();
@@ -48,9 +49,7 @@ export default function Login() {
           minHeight: '100vh',
         }}
       >
-        {
-          (loginError.length > 0) && <Alert severity="error" variant="filled" sx={{ m: 5 }}>{loginError}</Alert>
-        }
+        <ErrorBox message={loginError} />
         <FormControl sx={{ m: 2, width: "80%", backgroundColor: theme.palette.primary.light }} variant="outlined">
           <InputLabel htmlFor="outlined-adornment-email">Email Address</InputLabel>
           <OutlinedInput

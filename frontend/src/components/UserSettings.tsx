@@ -13,10 +13,10 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import Box from "@mui/material/Box";
-import Alert from "@mui/material/Alert";
 import Paper from "@mui/material/Paper";
 import TableBody from "@mui/material/TableBody";
 import { BackendApiContext } from "../App";
+import ErrorBox from "./ErrorBox";
 
 export default function UserSettings() {
   const [users, setUsers] = React.useState<User[]>([]);
@@ -44,9 +44,7 @@ export default function UserSettings() {
       alignItems="center"
       width="80vw"
     >
-      {
-        (userSettingsError.length > 0) && <Alert severity="error" variant="filled" sx={{ m: 5 }}>{userSettingsError}</Alert>
-      }
+      <ErrorBox message={userSettingsError} />
       <Accordion sx={{
         m: 3,
         width: "100%",
