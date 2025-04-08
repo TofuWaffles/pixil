@@ -140,8 +140,8 @@ export default function Login() {
               document.cookie = `Access-Token=` + tokenObj.token + `; Max-Age=` + (55 * 60 * 24 * 7); // Cookie will expire 5 minutes before the token does
 
               navigate("/");
-            } catch (response: any) {
-              switch (response.status) {
+            } catch (status: any) {
+              switch (status) {
                 case 401:
                 case 404:
                   setLoginError("Invalid email address or password entered.");
