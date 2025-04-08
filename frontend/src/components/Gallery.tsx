@@ -11,7 +11,7 @@ import { BackendApiContext } from "../App";
 import ErrorBox from "./ErrorBox";
 import Box from "@mui/material/Box";
 import { GalleryRefreshContext } from "./Layout";
-import CircularProgress from "@mui/material/CircularProgress";
+import LoadingIcon from "./LoadingIcon";
 
 
 export default function Gallery({ queryParams }: { queryParams: string | null }) {
@@ -45,19 +45,7 @@ export default function Gallery({ queryParams }: { queryParams: string | null })
     fetchImages();
   }, [queryParams, galleryRefresh]);
 
-  if (loading) return (
-
-    <Grid2
-      container
-      spacing={0}
-      direction="column"
-      alignItems="center"
-      justifyContent="center"
-      sx={{ minHeight: '100vh' }}
-    >
-      <CircularProgress />
-    </Grid2>
-  );
+  if (loading) return <LoadingIcon />;
 
   let thumbnailGroups: Map<number, Thumbnail[]> = new Map();
 
