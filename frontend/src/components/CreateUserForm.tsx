@@ -21,7 +21,7 @@ import { BackendApiContext } from "../App";
 import ErrorBox from "./ErrorBox";
 import SuccessBox from "./SuccessBox";
 
-export default function CreateUserForm() {
+export default function CreateUserForm({ setUsersRefresh }: { setUsersRefresh: React.Dispatch<React.SetStateAction<boolean>> }) {
   const theme = useTheme();
   const backendApi = useContext(BackendApiContext);
   const [email, setEmail] = React.useState("");
@@ -220,6 +220,7 @@ export default function CreateUserForm() {
               await backendApi.postUser(email, username, password, userType);
               setCreateUserSuccess("The new user has been created!");
               setCreateUserError("");
+              setUsersRefresh((val) => !val)
             } catch (response: any) {
               switch (response.status) {
                 case 409:

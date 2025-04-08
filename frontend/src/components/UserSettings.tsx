@@ -21,6 +21,7 @@ import ErrorBox from "./ErrorBox";
 export default function UserSettings() {
   const [users, setUsers] = React.useState<User[]>([]);
   const [userSettingsError, setUserSettingsError] = React.useState("");
+  const [usersRefresh, setUsersRefresh] = React.useState(true);
   const backendApi = useContext(BackendApiContext);
 
   React.useEffect(() => {
@@ -34,7 +35,7 @@ export default function UserSettings() {
     }
 
     fetchUsers()
-  }, []);
+  }, [usersRefresh]);
 
   return (
     <Grid2
@@ -57,7 +58,7 @@ export default function UserSettings() {
           <Typography component="span">Create User</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <CreateUserForm />
+          <CreateUserForm setUsersRefresh={setUsersRefresh} />
         </AccordionDetails>
       </Accordion>
       <TableContainer component={Paper}>
