@@ -1,6 +1,6 @@
 # Pixil 📸
 
-![pixil-banner](./frontend/src/assets/banner.png)
+![pixil-banner](./frontend/src/assets/banner-small.png)
 
 Pixil is an open-source, self-hosted photo and video gallery built for privacy, performance, and ease of use. Whether you're backing up family memories or organizing a massive media archive, Pixil keeps your content safe and accessible—on your own terms.
 
