@@ -21,8 +21,8 @@ Pixil is an open-source, self-hosted photo and video gallery built for privacy, 
 |-----------|---------------------------------|
 | Frontend  | React, TypeScript, Tailwind CSS |
 | Backend   | Golang (REST API)               |
-| Image Proc| Python (YOLO interface          |
-| Infra     | Docker, Docker Compose, Nginx   |
+| Image Recognition| Python (YOLO interface)         |
+| Infrastructure   | Docker, Docker Compose, Nginx   |
 
 ---
 
@@ -45,7 +45,7 @@ cp .env.example .env
 
 Make sure to fill the variables in the .env config.
 
-Note: For the DOMAIN_URL variable, be sure to include only the root domain and top level domain.
+Note: For the DOMAIN_URL variable, be sure to include only the root domain and top level domain.\
 e.g. example.com (NOT https://example.com or www.example.com)
 
 ### 3. Build and run with Docker
@@ -60,4 +60,4 @@ For the production build
 docker compose --profile prod up --build
 ```
 
-> You’ll now be able to access Pixil from `http://localhost:3000`.
+> You’ll now be able to access Pixil from `http://localhost:3000` on the development build or your domain url on the production build.
