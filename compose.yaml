@@ -45,7 +45,7 @@ services:
       ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
       DOMAIN_URL: "https://${DOMAIN_URL}"
       CLASSIFIER_URL: "http://classifier:5000"
-      LOG_LEVEL: "DEBUG"
+      LOG_LEVEL: "ERROR"
     networks:
       - frontend
       - backend
