@@ -1,8 +1,8 @@
 import { Button, styled } from "@mui/material";
 import CloudUploadIcon from '@mui/icons-material/Upload';
-import { useContext } from "react";
 import { BackendApiContext } from "../App";
-
+import React from "react";
+import { GalleryRefreshContext } from "./Layout";
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -17,7 +17,9 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 export default function UploadButton() {
-  const backendApi = useContext(BackendApiContext);
+  const backendApi = React.useContext(BackendApiContext);
+  const [_, setGalleryRefresh] = React.useContext(GalleryRefreshContext);
+
   return (
     <Button
       component="label"
@@ -39,7 +41,7 @@ export default function UploadButton() {
           }
           try {
             await backendApi.postMedia(event.target.files![0]);
-            window.location.reload();
+            setGalleryRefresh((val) => !val);
           } catch (statusCode: any) {
             console.log(statusCode);
           }

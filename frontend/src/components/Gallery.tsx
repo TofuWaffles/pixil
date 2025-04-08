@@ -8,13 +8,17 @@ import UploadButton from "./UploadButton";
 import Grid2 from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
 import { BackendApiContext } from "../App";
+import ErrorBox from "./ErrorBox";
+import Box from "@mui/material/Box";
+import { GalleryRefreshContext } from "./Layout";
 
 
 export default function Gallery({ queryParams }: { queryParams: string | null }) {
   const [thumbnails, setThumbnails] = React.useState<{ id: number; createdAt: Date; src: string }[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string>("");
   const backendApi = useContext(BackendApiContext);
+  const [galleryRefresh, _] = useContext(GalleryRefreshContext);
 
   React.useEffect(() => {
     const fetchImages = async () => {
@@ -38,11 +42,10 @@ export default function Gallery({ queryParams }: { queryParams: string | null })
     }
 
     fetchImages();
-  }, [queryParams]);
+  }, [queryParams, galleryRefresh]);
 
   // TODO: Make a prettier loading and error screen
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
 
   let thumbnailGroups: Map<number, Thumbnail[]> = new Map();
 
@@ -68,31 +71,34 @@ export default function Gallery({ queryParams }: { queryParams: string | null })
     )
   })
 
-  if (thumbnails.length == 0) {
-    return (
-      <Grid2
-        container
-        spacing={0}
-        direction="column"
-        alignItems="center"
-        justifyContent="center"
-        sx={{ minHeight: '100vh' }}
-      >
-        <Typography variant="h5">
-          Looks a little lonely. Let's change that.
-        </Typography>
-        <UploadButton />
-      </Grid2>
-    )
-  }
-
   return (
-    <div className="flex h-screen flex-col">
-      <div style={{ display: "flex-1", flexWrap: "wrap", gap: "10px" }}>
-        <List sx={{ width: "100%" }}>
-          {thumbnailGroupComponents}
-        </List>
-      </div>
-    </div>
+    <Box>
+      <ErrorBox message={error} />
+      {
+        (thumbnails.length === 0) ? (
+          <Grid2
+            container
+            spacing={0}
+            direction="column"
+            alignItems="center"
+            justifyContent="center"
+            sx={{ minHeight: '100vh' }}
+          >
+            <Typography variant="h5">
+              Looks a little lonely. Let's change that.
+            </Typography>
+            <UploadButton />
+          </Grid2>
+        ) : (
+          <div className="flex h-screen flex-col">
+            <div style={{ display: "flex-1", flexWrap: "wrap", gap: "10px" }}>
+              <List sx={{ width: "100%" }}>
+                {thumbnailGroupComponents}
+              </List>
+            </div>
+          </div>
+        )
+      }
+    </Box>
   );
 }
