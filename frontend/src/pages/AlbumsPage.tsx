@@ -8,14 +8,17 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
-import { Button, List } from "@mui/material";
+import { Button, List, Snackbar } from "@mui/material";
 import GrayBackground from "../assets/gray-background.png"
 import { BackendApiContext } from "../App";
+import LoadingIcon from "../components/LoadingIcon";
+import ErrorBox from "../components/ErrorBox";
 
 export default function AlbumsPage() {
   const [error, setError] = React.useState("");
   const [loading, setLoading] = React.useState(true);
   const [albumThumbnails, setAlbumThumbnails] = React.useState<[Album, Thumbnail][]>([]);
+  const [albumsRefresh, setAlbumsRefresh] = React.useState(true);
   const backendApi = useContext(BackendApiContext);
 
   React.useEffect(() => {
@@ -50,12 +53,10 @@ export default function AlbumsPage() {
     }
 
     fetchImages();
-  }, []);
+  }, [albumsRefresh]);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-
-  console.log("Albums: ", albumThumbnails);
+  if (loading) return <LoadingIcon />;
+  if (error) return <ErrorBox message={error} />;
 
   let thumbnailComponents: ReactElement[] = [];
 
@@ -69,7 +70,7 @@ export default function AlbumsPage() {
 
   return (
     <Box>
-      <AlbumPageHeader />
+      <AlbumPageHeader setAlbumRefresh={setAlbumsRefresh} />
       {albumThumbnails.length == 0 ?
         <Grid2
           container
@@ -95,7 +96,7 @@ export default function AlbumsPage() {
   )
 }
 
-function AlbumPageHeader() {
+function AlbumPageHeader({ setAlbumRefresh }: { setAlbumRefresh: React.Dispatch<React.SetStateAction<boolean>> }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar sx={{
@@ -114,17 +115,18 @@ function AlbumPageHeader() {
           >
             Albums
           </Typography>
-          <CreateAlbumButton />
+          <CreateAlbumButton setAlbumRefresh={setAlbumRefresh} />
         </Toolbar>
       </AppBar>
     </Box>
   )
 }
 
-function CreateAlbumButton() {
+function CreateAlbumButton({ setAlbumRefresh }: { setAlbumRefresh: React.Dispatch<React.SetStateAction<boolean>> }) {
   const backendApi = useContext(BackendApiContext);
   const [albumName, setAlbumName] = React.useState("");
   const [error, setError] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState("");
 
   return (
     <Box
@@ -161,11 +163,24 @@ function CreateAlbumButton() {
             setError(true);
             return;
           }
-          await backendApi.postAlbum(albumName);
+          try {
+            await backendApi.postAlbum(albumName);
+          } catch (err) {
+            setErrorMessage("Someone thing wrong when trying to create the album.");
+          } finally {
+            setAlbumRefresh((val) => !val);
+          }
         }}
       >
         Create
       </Button>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={errorMessage.length > 0}
+        onClose={() => setErrorMessage("")}
+        autoHideDuration={5000}
+        message={error}
+      />
     </Box>
   );
 }
