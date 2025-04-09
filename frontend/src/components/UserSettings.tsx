@@ -17,10 +17,13 @@ import Paper from "@mui/material/Paper";
 import TableBody from "@mui/material/TableBody";
 import { BackendApiContext } from "../App";
 import ErrorBox from "./ErrorBox";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from '@mui/icons-material/Delete';
+import ConfirmDialog from "./ConfirmDialog";
 
 export default function UserSettings() {
   const [users, setUsers] = React.useState<User[]>([]);
-  const [userSettingsError, setUserSettingsError] = React.useState("");
+  const [userSettingsError, setError] = React.useState("");
   const [usersRefresh, setUsersRefresh] = React.useState(true);
   const backendApi = useContext(BackendApiContext);
 
@@ -30,7 +33,7 @@ export default function UserSettings() {
         const users: User[] = await backendApi.getUsers();
         setUsers(users);
       } catch (err: any) {
-        setUserSettingsError(err);
+        setError(err);
       }
     }
 
@@ -68,6 +71,7 @@ export default function UserSettings() {
               <TableCell><Typography><Box sx={{ fontWeight: "bold" }}>Email Address</Box></Typography></TableCell>
               <TableCell><Typography><Box sx={{ fontWeight: "bold" }}>Username</Box></Typography></TableCell>
               <TableCell><Typography><Box sx={{ fontWeight: "bold" }}>Account Type</Box></Typography></TableCell>
+              <TableCell><Typography><Box sx={{ fontWeight: "bold" }}>Delete</Box></Typography></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -81,6 +85,16 @@ export default function UserSettings() {
                   <TableCell>{
                     user.userType == 0 ? "Member" : "Admin"
                   }</TableCell>
+                  {user.email !== "admin@admin.com" &&
+                    <TableCell>
+                      <DeleteUserButton
+                        email={user.email}
+                        username={user.username}
+                        setError={setError}
+                        setUsersRefresh={setUsersRefresh}
+                      />
+                    </TableCell>
+                  }
                 </TableRow>
               ))
             }
@@ -88,5 +102,47 @@ export default function UserSettings() {
         </Table>
       </TableContainer>
     </Grid2 >
+  )
+}
+
+function DeleteUserButton({
+  email,
+  username,
+  setError,
+  setUsersRefresh,
+}: {
+  email: string,
+  username: string,
+  setError: React.Dispatch<React.SetStateAction<string>>,
+  setUsersRefresh: React.Dispatch<React.SetStateAction<boolean>>,
+}) {
+  const [open, setOpen] = React.useState(false);
+  const backendApi = React.useContext(BackendApiContext);
+
+  return (
+    <Box>
+      <IconButton
+        aria-label="delete"
+        onClick={() => setOpen(true)}
+      >
+        <DeleteIcon />
+      </IconButton>
+      <ConfirmDialog
+        title="Delete User"
+        message={`Are you sure you want to delete user ${username}?`}
+        open={open}
+        setOpen={setOpen}
+        confirmOnClick={async () => {
+          setOpen(false);
+          try {
+            await backendApi.deleteUser(email);
+          } catch (statusCode: any) {
+            setError("Something went wrong when trying to delete the user");
+          } finally {
+            setUsersRefresh((val) => !val);
+          }
+        }}
+      />
+    </Box>
   )
 }

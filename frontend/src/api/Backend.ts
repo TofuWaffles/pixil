@@ -141,6 +141,14 @@ export default class BackendApi {
     }
   }
 
+  async deleteUser(email: string) {
+    const response = await this.backendRequest(null, "DELETE", `/user?email${email}`, true);
+
+    if (!response.ok) {
+      throw response;
+    }
+  }
+
   async getStorage() {
     const response = await this.backendRequest(null, "GET", "/storage", true);
     if (!response.ok) {

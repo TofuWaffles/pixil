@@ -32,8 +32,19 @@ export default function ConfirmDialog({
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => setOpen(false)}>Cancel</Button>
-        <Button onClick={confirmOnClick} autoFocus>
+        <Button
+          sx={{
+            color: "secondary.main"
+          }}
+          onClick={() => setOpen(false)}
+        >Cancel</Button>
+        <Button
+          sx={{
+            color: "secondary.main"
+          }}
+          onClick={confirmOnClick}
+          autoFocus
+        >
           Delete
         </Button>
       </DialogActions>

@@ -20,19 +20,19 @@ export default function MediaDeleteButton({ mediaId }: { mediaId: number }) {
             width: 100,
             height: 100
           }}
-          onClick={async () => {
-            await backendApi.deleteMedia(mediaId);
-            window.location.href = "/";
+          onClick={() => {
+            setOpen(true);
           }}>
           <DeleteIcon sx={{ width: 40, height: 40 }} />
         </IconButton >
       </Tooltip>
       <ConfirmDialog
-        title="Confirm Delete"
+        title="Delete Photo or Video"
         message="Are you sure you want to this photo or video?"
         open={open}
         setOpen={setOpen}
         confirmOnClick={async () => {
+          setOpen(false);
           await backendApi.deleteMedia(mediaId);
           window.location.href = "/";
         }}
