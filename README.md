@@ -12,6 +12,7 @@ Pixil is an open-source, self-hosted photo and video gallery built for privacy, 
 - 🌐 **Web-Based Interface** — Intuitive UI built with modern web technologies.
 - 🖼️ **Media Management** — Browse, search, and organize photos and videos easily.
 - 🧠 **AI Recognition (WIP)** — Smart tagging using the [YOLO v11 model](https://docs.ultralytics.com/models/yolo11/).
+- 📈 **Easy Deployment** - Simple three-step deployment process.
 - 🔄 **Sync & Upload** — Efficient uploads with metadata extraction.
 - 🗃️ **Albums** — Organize your media into custom collections.
 
@@ -23,6 +24,7 @@ Pixil is an open-source, self-hosted photo and video gallery built for privacy, 
 |-----------|---------------------------------|
 | Frontend  | React, TypeScript, Tailwind CSS |
 | Backend   | Golang (REST API)               |
+| Database  | Postgres                        |
 | Image Recognition| Python (YOLO interface)         |
 | Infrastructure   | Docker, Docker Compose, Nginx   |
 
@@ -39,7 +41,7 @@ cd pixil
 
 ### 2. Set up environment
 
-Copy the example `.env` file and fill in your own secrets/config:
+Copy the example `.env` file and fill in your own secrets and config:
 
 ```bash
 cp .env.example .env
