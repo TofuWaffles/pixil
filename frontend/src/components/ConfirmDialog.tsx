@@ -18,23 +18,25 @@ export default function ConfirmDialog({
   setOpen: React.Dispatch<React.SetStateAction<boolean>>,
   confirmOnClick: React.MouseEventHandler<HTMLButtonElement> | undefined
 }) {
-  <Dialog
-    open={open}
-    onClose={() => setOpen(false)}
-  >
-    <DialogTitle id="confirm-delete">
-      {title}
-    </DialogTitle>
-    <DialogContent>
-      <DialogContentText id="alert-dialog-description">
-        {message}
-      </DialogContentText>
-    </DialogContent>
-    <DialogActions>
-      <Button onClick={() => setOpen(false)}>Cancel</Button>
-      <Button onClick={confirmOnClick} autoFocus>
-        Delete
-      </Button>
-    </DialogActions>
-  </Dialog>
+  return (
+    <Dialog
+      open={open}
+      onClose={() => setOpen(false)}
+    >
+      <DialogTitle id="confirm-delete">
+        {title}
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText id="alert-dialog-description">
+          {message}
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setOpen(false)}>Cancel</Button>
+        <Button onClick={confirmOnClick} autoFocus>
+          Delete
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
 }
