@@ -1,4 +1,4 @@
-import { Box, Button, Snackbar, styled } from "@mui/material";
+import { Alert, Box, Button, Snackbar, styled } from "@mui/material";
 import CloudUploadIcon from '@mui/icons-material/Upload';
 import { BackendApiContext } from "../App";
 import React from "react";
@@ -20,6 +20,8 @@ export default function UploadButton() {
   const backendApi = React.useContext(BackendApiContext);
   const [_, setGalleryRefresh] = React.useContext(GalleryRefreshContext);
   const [error, setError] = React.useState("");
+  const [uploadSuccess, setUploadSuccess] = React.useState(false);
+  const [uploading, setUploading] = React.useState(false)
   const allowedExt = new Set([
     "image/png",
     "image/jpg",
@@ -50,10 +52,14 @@ export default function UploadButton() {
               return;
             }
             try {
+              setUploading(true);
               await backendApi.postMedia(event.target.files![0]);
+              setUploadSuccess(true);
               setGalleryRefresh((val) => !val);
             } catch (response: any) {
               setError("Something went wrong trying to upload the files.")
+            } finally {
+              setUploading(false);
             }
           }}
           multiple
@@ -61,11 +67,37 @@ export default function UploadButton() {
       </Button>
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={uploading}
+        onClose={() => setUploading(false)}
+      />
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={uploadSuccess}
+        onClose={() => setUploadSuccess(false)}
+        autoHideDuration={5000}
+      >
+        <Alert
+          onClose={() => setUploadSuccess(false)}
+          severity="success"
+          variant="filled"
+        >
+          Uploaded successfully!
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={error.length > 0}
         onClose={() => setError("")}
         autoHideDuration={5000}
-        message={error}
-      />
+      >
+        <Alert
+          onClose={() => setError("")}
+          severity="error"
+          variant="filled"
+        >
+          {error}
+        </Alert>
+      </Snackbar>
     </Box>
   )
 }
