@@ -221,8 +221,8 @@ export default function CreateUserForm({ setUsersRefresh }: { setUsersRefresh: R
               setCreateUserSuccess("The new user has been created!");
               setCreateUserError("");
               setUsersRefresh((val) => !val)
-            } catch (response: any) {
-              switch (response.status) {
+            } catch (statusCode: any) {
+              switch (statusCode) {
                 case 409:
                   setCreateUserError("User with the provided email address already exists");
                   break;
