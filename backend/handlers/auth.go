@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -179,7 +180,7 @@ func (e Env) Login(w http.ResponseWriter, r *http.Request) {
 		jwt.MapClaims{
 			"email":    user.Email,
 			"username": user.Username,
-			"userType": user.UserType,
+			"userType": strconv.Itoa(user.UserType),
 			"sub":      "auth",
 			"iss":      "pixil",
 			"exp":      time.Now().Add(time.Hour * 24 * 7).Unix(),
@@ -214,6 +215,15 @@ func (e Env) Authenticate() Middleware {
 				return
 			}
 			claims := token.Claims.(jwt.MapClaims)
+
+			email := claims["email"].(string)
+			_, err = models.GetUser(r.Context(), e.Database, email)
+			if err != nil {
+				http.Error(w, "User cannot be verified", http.StatusUnauthorized)
+				e.Logger.Info("Email in auth token does not match any existing user. The user could be deleted", "email", email)
+				return
+			}
+
 			exp, err := claims.GetExpirationTime()
 			if err != nil {
 				http.Error(w, "Invalid token", http.StatusUnauthorized)
