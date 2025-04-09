@@ -69,6 +69,7 @@ export default function UploadButton() {
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={uploading}
         onClose={() => setUploading(false)}
+        message="Uploading..."
       />
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
