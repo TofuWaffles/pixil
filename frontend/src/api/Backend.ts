@@ -142,7 +142,7 @@ export default class BackendApi {
   }
 
   async deleteUser(email: string) {
-    const response = await this.backendRequest(null, "DELETE", `/user?email${email}`, true);
+    const response = await this.backendRequest(null, "DELETE", `/user?email=${email}`, true);
 
     if (!response.ok) {
       throw response;
