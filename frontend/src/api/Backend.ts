@@ -191,6 +191,9 @@ export default class BackendApi {
     request.headers = headers;
 
     const response = await fetch(this.url + "/api" + path, request);
+    if (response.status == 401) {
+      window.location.href = "/login"
+    }
     if (!response.ok) {
       throw response.status
     }
