@@ -11,7 +11,7 @@ Pixil is an open-source, self-hosted photo and video gallery built for privacy, 
 - 🔐 **Secure & Private** — Your data stays with you. No third-party access.
 - 🌐 **Web-Based Interface** — Intuitive UI built with modern web technologies.
 - 🖼️ **Media Management** — Browse, search, and organize photos and videos easily.
-- 🧠 **AI Recognition (WIP)** — Smart tagging using the [YOLO v11 model](https://docs.ultralytics.com/models/yolo11/).
+- 🧠 **AI Recognition** — Smart tagging using the [YOLO v11 model](https://docs.ultralytics.com/models/yolo11/).
 - 📈 **Easy Deployment** - Simple three-step deployment process.
 - 🔄 **Sync & Upload** — Efficient uploads with metadata extraction.
 - 🗃️ **Albums** — Organize your media into custom collections.
