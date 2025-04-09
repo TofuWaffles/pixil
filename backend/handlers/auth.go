@@ -22,6 +22,9 @@ func (e Env) User(w http.ResponseWriter, r *http.Request) {
 	} else if r.Method == "POST" {
 		e.PostUser(w, r)
 		return
+	} else if r.Method == "DELETE" {
+		e.DeleteUser(w, r)
+		return
 	}
 
 	w.WriteHeader(http.StatusBadRequest)
@@ -128,6 +131,18 @@ func (e Env) PostUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func (e Env) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	email := r.URL.Query().Get("email")
+
+	err := models.DeleteUser(r.Context(), e.Database, email)
+	if err != nil {
+		http.Error(w, genericErrMsg, http.StatusInternalServerError)
+		e.Logger.Error("Unable to delete user from the database", "error", err)
+	}
+
+	return
 }
 
 func (e Env) Login(w http.ResponseWriter, r *http.Request) {

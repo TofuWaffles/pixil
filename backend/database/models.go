@@ -90,6 +90,15 @@ func AddUser(ctx context.Context, db *pgxpool.Pool, user User) error {
 	return err
 }
 
+func DeleteUser(ctx context.Context, db *pgxpool.Pool, email string) error {
+	_, err := db.Exec(ctx,
+		`DELETE FROM "user"
+    WHERE email = $1`,
+		email,
+	)
+	return err
+}
+
 func CheckUserExists(ctx context.Context, db *pgxpool.Pool, email string) (bool, error) {
 	var res bool
 	err := db.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM "user" WHERE email = $1)`, email).Scan(&res)
