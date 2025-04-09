@@ -206,7 +206,7 @@ func (e Env) Authenticate() Middleware {
 				return
 			}
 			tokenString := parts[1]
-			token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 				return []byte(os.Getenv("JWT_KEY")), nil
 			})
 			if err != nil {
