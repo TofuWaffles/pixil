@@ -69,15 +69,12 @@ func (e Env) AllowCORS(allowedOrigin string) Middleware {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			origin := r.Header.Get("Origin")
-			e.Logger.Info("Checking CORS", "origin", origin, "allowed", allowedOrigin)
 			if origin == allowedOrigin {
 				w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
 				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 				w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 				w.Header().Set("Access-Control-Allow-Credentials", "true")
 			}
-
-			e.Logger.Info("Checking response headers", "Allow origin", w.Header().Get("Access-Control-Allow-Origin"))
 
 			// Handle preflight request
 			if r.Method == http.MethodOptions {

@@ -242,8 +242,6 @@ export default function CreateUserForm({ setUsersRefresh }: { setUsersRefresh: R
 
 function checkEmail(email: string, setEmailError: React.Dispatch<React.SetStateAction<string>>) {
   if (!validateEmail(email)) {
-    console.log("Invalid email: ", email);
-
     setEmailError("Invalid email address entered.");
   } else {
     setEmailError("");

@@ -364,7 +364,6 @@ func (e Env) AddAlbumMedia(w http.ResponseWriter, r *http.Request) {
 		e.Logger.Error("Unable to unmarshal the request body", "error", err, "album_media", albumMedia)
 		return
 	}
-	e.Logger.Info("Album media post request", "album_media", albumMedia)
 	err = models.AddAlbumMedia(r.Context(), e.Database, albumMedia.AlbumId, albumMedia.MediaId)
 	if err != nil {
 		http.Error(w, genericErrMsg, http.StatusInternalServerError)
