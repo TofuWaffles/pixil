@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -180,7 +179,7 @@ func (e Env) Login(w http.ResponseWriter, r *http.Request) {
 		jwt.MapClaims{
 			"email":    user.Email,
 			"username": user.Username,
-			"userType": strconv.Itoa(user.UserType),
+			"userType": user.UserType,
 			"sub":      "auth",
 			"iss":      "pixil",
 			"exp":      time.Now().Add(time.Hour * 24 * 7).Unix(),
