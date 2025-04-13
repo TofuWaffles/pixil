@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 )
 
-// TODO: Handle target and src dir using env vars or conf files or something
 const MediaDir = "/pixil-media/"
 
 func LoadImage(mediaFp string) (image.Image, error) {

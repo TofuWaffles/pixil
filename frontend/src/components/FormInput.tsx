@@ -32,7 +32,6 @@ export default function FormInput(props: FormInputProps) {
         autoFocus={true}
         fullWidth={true}
         error={errorMessage !== ""}
-        // TODO: Fix semi-broken onBlur check
         onBlur={onBlur}
         onFocus={onFocus}
         type={password && !showPassword ? "password" : "text"}
