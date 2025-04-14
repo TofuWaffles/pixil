@@ -16,8 +16,8 @@ class ClassificationHandler(BaseHTTPRequestHandler):
         query_params = parse_qs(url.query)
         logging.info("Classifying image: ", query_params)
         self._set_response()
-        results = model("/pixil-media/" +
-                        str(query_params.get("filename"))[2:-2])
+        results = model(source="/pixil-media/" +
+                        str(query_params.get("filename"))[2:-2], stream=True)
         labels = set()
         for r in results:
             for t in r.summary():
