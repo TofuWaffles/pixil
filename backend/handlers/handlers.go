@@ -470,6 +470,7 @@ func (e Env) ClassifyMedia(mediaID int) {
 	}
 
 	e.Logger.Info("Classifying media...", "filename", filename)
+	start := time.Now()
 	res, err := client.Do(req)
 	if err != nil {
 		e.Logger.Error("Unable to classify media", "error", err, "filename", filename)
@@ -488,7 +489,7 @@ func (e Env) ClassifyMedia(mediaID int) {
 		}
 	}
 
-	e.Logger.Info("Finished classifying media", "filename", filename)
+	e.Logger.Info("Finished classifying media", "filename", filename, "time_taken", time.Since(start))
 }
 
 func (e Env) Storage(w http.ResponseWriter, r *http.Request) {
