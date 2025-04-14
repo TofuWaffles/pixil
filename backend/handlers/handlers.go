@@ -466,9 +466,10 @@ func (e Env) ClassifyMedia(mediaID int) {
 	req.Header.Set("Accept", "application/json")
 
 	client := http.Client{
-		Timeout: 60 * time.Second,
+		Timeout: 300 * time.Second,
 	}
 
+	e.Logger.Info("Classifying media...", "filename", filename)
 	res, err := client.Do(req)
 	if err != nil {
 		e.Logger.Error("Unable to classify media", "error", err, "filename", filename)
@@ -486,6 +487,8 @@ func (e Env) ClassifyMedia(mediaID int) {
 			e.Logger.Error("Unable to write tag to the database", "error", err, "media_id", mediaID, "tag", tag)
 		}
 	}
+
+	e.Logger.Info("Finished classifying media", "filename", filename)
 }
 
 func (e Env) Storage(w http.ResponseWriter, r *http.Request) {
